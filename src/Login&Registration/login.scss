@@ -1,0 +1,81 @@
+.main-div {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  .log-img {
+    width: 75%;
+    background-size: cover;
+    height: 885px;
+    background-image: url("../Images/hero-4.jpg");
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    p {
+      font-size: 30px;
+      color: #fff;
+      font-family: auto;
+      width: 50%;
+      margin-right: 20px;
+    }
+  }
+  .log-form {
+    width: 30%;
+    height: 885px;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .container {
+      width: 80%;
+      padding: 40px;
+      border: 1px solid #000;
+    }
+    .ad-sec {
+      border-bottom-left-radius: 65px;
+      border-top-right-radius: 65px;
+      background-color: white;
+      height: 63px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 17px;
+    }
+    .header {
+      font-size: 25px;
+      font-family: auto;
+      color: #fff;
+    }
+  }
+  .form-group {
+    display: flex;
+    .form-label {
+      width: 20%;
+      color: #fff;
+    }
+  }
+  .form-input {
+    border: 1px solid #fff;
+    height: 37px;
+    margin-bottom: 21px;
+    margin-left: 15px;
+    width: 245px;
+    // background: transparent;
+    border-radius: 10px;
+  }
+  .form-btn button {
+    background: white;
+    margin-top: 20px;
+    height: 30px;
+    cursor: pointer;
+    width: 37%;
+    font-weight: 600;
+    color: #000;
+    margin-right: 25px;
+    border: 1px solid #fff;
+    border-top-right-radius: 25px;
+    border-bottom-left-radius: 20px;
+  }
+}

@@ -1,0 +1,87 @@
+.booking-main {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 546px;
+  // justify-content: center;
+  .category2 {
+    width: 30%;
+    margin-left: 10%;
+    .category-main2 {
+      .category-card2 {
+        cursor: pointer;
+        width: 55%;
+        border: 9px solid;
+        padding: 10px;
+        border-radius: 15px;
+        cursor: pointer;
+        cursor: pointer;
+        .category-img2 {
+          img {
+            width: 100%;
+            height: 200px;
+          }
+        }
+        .category-details2 {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 10px;
+          .category-lab2 {
+            margin-right: 15px;
+          }
+        }
+      }
+    }
+  }
+  .booking-form {
+    width: 50%;
+    height: 77%;
+    border: 1px solid #000;
+    .form-fn {
+      background-color: #fbfbfb;
+      margin-right: 10%;
+      margin-top: 2%;
+      margin-bottom: 2%;
+      width: 300px;
+      margin-left: 10%;
+    }
+    .form-ln {
+      background-color: #fbfbfb;
+      margin-left: 54px;
+      margin-right: 10%;
+      margin-top: 2%;
+      margin-bottom: 2%;
+      width: 300px;
+    }
+    .form-em {
+      margin-right: 10%;
+      margin-top: 2%;
+      margin-bottom: 2%;
+      width: 260px;
+      margin-left: 10%;
+    }
+    .form-ag {
+      width: 300px;
+    }
+    .form-ph {
+      width: 300px;
+      margin-right: 20px;
+    }
+    .form-select {
+      background-color: #fbfbfb;
+      width: 260px;
+    }
+    .form-date {
+      margin-right: 70px;
+      width: 30%;
+    }
+    .form-time {
+      background-color: #fbfbfb;
+      width: 50%;
+      margin-left: 1%;
+      margin-bottom: 2%;
+      margin-top: 2%;
+    }
+  }
+}

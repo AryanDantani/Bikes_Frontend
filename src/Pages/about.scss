@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.ab-main {
+  width: 100%;
+  .herp-section {
+    width: 100%;
+    height: 800px;
+    background-image: url("../Images/hero-1.jpg");
+    background-size: cover;
+    background-position: center center; /* Center the background image */
+    display: flex;
+    justify-content: start;
+    .hero-content {
+      color: #fff;
+      font-family: auto;
+      width: 62%;
+      font-size: 40px;
+      display: block;
+      margin-top: 20%;
+      .head1 {
+        font-size: 145px;
+      }
+      .ab-name {
+        margin-left: 40%;
+      }
+    }
+  }
+  .ab-cont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .ab-head {
+      width: 100%;
+      padding: 121px;
+      border: 23px solid #000;
+    }
+  }
+}

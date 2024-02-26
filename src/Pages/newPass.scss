@@ -1,0 +1,51 @@
+.main-pass-div {
+  width: 100%;
+  height: 885px;
+  background-size: cover;
+  background-image: url("../Images/bg-2.jpg");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .log-img {
+    border-top-left-radius: 18%;
+    border-bottom-left-radius: 15%;
+    width: 30%;
+    height: 400px;
+    background-size: cover;
+    background-image: url("../Images/ggif-1.gif");
+  }
+  .bg-layer {
+    width: 35%;
+    height: 395px;
+    border: 1px solid #fff;
+    .pass-form {
+      width: 80%;
+      margin-left: 10%;
+    }
+    .pass-input {
+        width: 300px;
+        color: #000;
+        height: 25px;
+        background: transparent;
+        border: 1px solid #fff;
+        margin-top: 20%;
+    }
+    .pass-btn {
+      margin-top: 7%;
+      margin-left: 25px;
+      width: 35%;
+      height: 30px;
+      font-weight: 700;
+      border: 1px solid #fff;
+      background: #ed9191;
+      color: #fff;
+      cursor: pointer;
+    }
+    h3 {
+      font-size: 50px;
+      font-family: math;
+      color: #73b9bb;
+      background-color: #fff;
+    }
+  }
+}
