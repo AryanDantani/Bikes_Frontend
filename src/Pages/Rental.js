@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */ import "./bookingPage.scss";
+import "./bookingPage.scss";
 import React, { useEffect, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
 import "./rentalFrom.scss";
+import { styled } from "@mui/material/styles";
 import {
   Dialog,
   DialogTitle,
@@ -20,19 +21,51 @@ import {
   Button,
   TextField,
   InputLabel,
+  TableContainer,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  Table,
+  Paper,
 } from "@mui/material";
+import { tableCellClasses } from "@mui/material/TableCell";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
 
 const Rental = () => {
   // const navigate = useNavigate();
   const [rentalData, setRentalData] = useState([]);
-  const [isAdded, setIsAdded] = useState(false);
+  const [data, setData] = useState({
+    rentalId: "",
+    userId: "",
+  });
   const [editData, setEditData] = useState({
     firstname: "",
     lastname: "",
     email: "",
     age: "",
     date: "",
-    time: "",
+    startTime: "",
+    endTime: "",
     city: "",
   });
   const [bookingId, setBookingId] = useState("");
@@ -48,7 +81,7 @@ const Rental = () => {
     ? JSON.parse(localStorage.getItem("user"))
     : "";
 
-  const handleTimeChange = (time) => {
+  const handleChangeStartTime = (time) => {
     const dateObject = time instanceof Date ? time : new Date(time);
     const formattedTime = dateObject.toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -58,7 +91,21 @@ const Rental = () => {
 
     setEditData({
       ...editData,
-      time: formattedTime,
+      startTime: formattedTime,
+    });
+  };
+
+  const handleChangeEndTime = (time) => {
+    const dateObject = time instanceof Date ? time : new Date(time);
+    const formattedTime = dateObject.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    setEditData({
+      ...editData,
+      endTime: formattedTime,
     });
   };
 
@@ -75,16 +122,16 @@ const Rental = () => {
   };
 
   const GetBookingForUser = async () => {
-    let data = await fetch(`http://localhost:4000/api/rental/${UserData}`);
+    let data = await fetch(`http://localhost:4000/api/rental/user/${UserData}`);
     data = await data.json();
-    console.log(data)
+    console.log(data);
     setRentalData(data);
   };
 
   const GetBookingForAdmin = async () => {
     let data = await fetch(`http://localhost:4000/api/rental`);
     data = await data.json();
-    console.log(data.map((i) => i.bike))
+    console.log(data.map((i) => i.bike));
     setRentalData(data);
   };
 
@@ -98,7 +145,8 @@ const Rental = () => {
           email: editData.email,
           age: editData.age,
           date: editData.date,
-          time: editData.time,
+          startTime: editData.startTime,
+          endTime: editData.endTime,
           city: editData.city,
         }
       );
@@ -112,24 +160,15 @@ const Rental = () => {
     }
   }
 
-  async function handlebooking(bookingId) {
-    try {
-      const response = await axios.put(
-        `http://localhost:4000/api/category/bikes/cancel/${bookingId}`,
-      );
-      if (response.status === 200) {
-        toast.success("Booking Canceled Successfully");
-        setIsOpen(false);
-      }
-    } catch (err) {
-      toast.error(err);
-    }
-  }
+  const DeleteBookings = async (userId, rentalId, bikeId) => {
+    const user = userId
+    const rental = rentalId
+    const bike = bikeId
 
-  const DeleteBookings = async (rentalId) => {
+    console.log(`user${userId} and rental${rentalId}`)
     try {
       const response = await fetch(
-        `http://localhost:4000/api/rental/${rentalId}`,
+        `http://localhost:4000/api/rental/booking/${rental}/${user}/${bike}`,
         {
           method: "DELETE",
           headers: {
@@ -171,150 +210,89 @@ const Rental = () => {
         )}
       </div>
       <div>
-        <div>
-          {rentalData.length > 0 && rentalData.map((item, index) => {
-            return (
-              <div key={item?._id}>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "116px",
-                    }}
-                  >
-                    <p>Name:</p>
-                  </div>
-                  <div>
-                    <p>{item.firstname + item.lastname}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "120px",
-                    }}
-                  >
-                    <p>Email:</p>
-                  </div>
-                  <div>
-                    <p>{item.email}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "113px",
-                    }}
-                  >
-                    <p>Phone:</p>
-                  </div>
-                  <div>
-                    <p>{item.phone}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "120px",
-                    }}
-                  >
-                    <p>Time:</p>
-                  </div>
-                  <div>
-                    <p>{item.time}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "120px",
-                    }}
-                  >
-                    <p>Date:</p>
-                  </div>
-                  <div>
-                    <p>{item.date}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "125px",
-                    }}
-                  >
-                    <p>City:</p>
-                  </div>
-                  <div>
-                    <p>{item.city}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "108px",
-                    }}
-                  >
-                    <p>Model:</p>
-                  </div>
-                  <div>
-                    <p>{item?.bike?.name}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "125px",
-                    }}
-                  >
-                    <p>Rent:</p>
-                  </div>
-                  <div>
-                    <p>{item?.bike?.rent}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <div
-                    style={{
-                      marginRight: "125px",
-                    }}
-                  >
-                    <p>KM:</p>
-                  </div>
-                  <div>
-                    <p>{item?.bike?.km}</p>
-                  </div>
-                </div>
-                <div className="sub-details">
-                  <button
-                    onClick={() => {
-                      setIsOpen(true);
-                      setBookingId(item?._id);
-                      setEditData({
-                        firstname: item.firstname,
-                        lastname: item.lastname,
-                        email: item.email,
-                        phone: item.phone,
-                        age: item.age,
-                        date: item.date,
-                        time: item.time,
-                        city: item.city,
-                      });
-                    }}
-                  >
-                    Edit Booking
-                  </button>
-                  <button
-                    onClick={() => {
-                      handlebooking(item?.bike?._id)
-                      DeleteBookings(item?._id);
-                    }}
-                  >
-                    Cancel Booking
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell align="center">No.</StyledTableCell>
+                <StyledTableCell align="center">Name</StyledTableCell>
+                <StyledTableCell align="center">Email</StyledTableCell>
+                <StyledTableCell align="center">Age</StyledTableCell>
+                <StyledTableCell align="center">Phone</StyledTableCell>
+                <StyledTableCell align="center">time</StyledTableCell>
+                <StyledTableCell align="center">Model</StyledTableCell>
+                <StyledTableCell align="center">Rent</StyledTableCell>
+                <StyledTableCell align="center">Mileage</StyledTableCell>
+                <StyledTableCell align="center">Action</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rentalData.length > 0 &&
+                rentalData.map((row, index) => (
+                  <StyledTableRow key={row.name}>
+                    <StyledTableCell component="th" scope="row">
+                      ({index + 1})
+                    </StyledTableCell>
+                    <StyledTableCell component="th" scope="row">
+                      {row?.firstname + row?.lastname}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row?.email}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">{row?.age}</StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row?.phone}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row?.startTime + " To " + row?.endTime}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row?.bike?.name}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row?.bike?.rent}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row?.bike?.mileage}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      <button
+                        onClick={() => {
+                          setIsOpen(true);
+                          setBookingId(row?._id);
+                          setEditData({
+                            firstname: row.firstname,
+                            lastname: row.lastname,
+                            email: row.email,
+                            phone: row.phone,
+                            age: row.age,
+                            date: row.date,
+                            startTime: row.startTime,
+                            endTime: row.endTime,
+                            city: row.city,
+                          });
+                        }}
+                      >
+                        Edit Booking
+                      </button>
+                      <button
+                        onClick={() => {
+                          // handlebooking(row?.bike?._id);
+                          if(User.role === 'admin') {
+                            DeleteBookings(row?.user?._id, row?._id, row?.bike?._id);
+                          }else {
+                            DeleteBookings(row?.user, row?._id);
+                          }
+                        }}
+                      >
+                        Cancel Booking
+                      </button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
       <Dialog
         open={isOpen}
@@ -368,7 +346,7 @@ const Rental = () => {
               label="Email id"
               variant="filled"
               style={{
-                width:"250px",
+                width: "250px",
                 marginRight: "12%",
                 marginTop: "3%",
               }}
@@ -387,7 +365,7 @@ const Rental = () => {
               label="Age"
               variant="filled"
               style={{
-                width:"250px",
+                width: "250px",
                 marginRight: "12%",
                 marginTop: "3%",
               }}
@@ -441,36 +419,57 @@ const Rental = () => {
               <option value={"Shilaj"}>Shilaj</option>
               <option value={"Bopal"}>Bopal</option>
             </select>
-            <LocalizationProvider
-              dateAdapter={AdapterDayjs}
-            >
-              <div style={{
-                position: "absolute",
-                top: "59.5%",
-                left: "56%",
-                width: "38%"
-              }}>
-              <DatePicker
-                value={dayjs(editData.date)}
-                onChange={handleDateChange}
-                format="DD/MM/YYYY"
-                disablePast
-              />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "59.5%",
+                  left: "56%",
+                  width: "38%",
+                }}
+              >
+                <DatePicker
+                  value={dayjs(editData.date)}
+                  onChange={handleDateChange}
+                  format="DD/MM/YYYY"
+                  disablePast
+                />
               </div>
+
               <TimePicker
-                label="With Time Clock"
+                label="Start Time"
                 style={{
                   width: "40%",
                   marginTop: "3%",
                 }}
-                value={editData.time}
-                onChange={handleTimeChange}
+                value={editData.startTime}
+                onChange={handleChangeStartTime}
                 viewRenderers={{
                   hours: renderTimeViewClock,
                   minutes: renderTimeViewClock,
                   seconds: renderTimeViewClock,
                 }}
               />
+
+              <div
+                style={{
+                  width: "40%",
+                  position: "absolute",
+                  bottom: "14.5%",
+                  left: "55%",
+                }}
+              >
+                <TimePicker
+                  label="End Time"
+                  value={editData.endTime}
+                  onChange={handleChangeEndTime}
+                  viewRenderers={{
+                    hours: renderTimeViewClock,
+                    minutes: renderTimeViewClock,
+                    seconds: renderTimeViewClock,
+                  }}
+                />
+              </div>
             </LocalizationProvider>
           </DialogContentText>
         </DialogContent>

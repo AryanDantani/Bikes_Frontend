@@ -43,15 +43,6 @@ const NavigationBar = () => {
         >
           <a>Rental Services</a>
         </div>
-
-        {/* <div
-          className="navigate"
-          onClick={() => {
-            navigate("/booking");
-          }}
-        >
-          <a>Bookings</a>
-        </div> */}
         <div
           className="navigate"
           onClick={() => {
@@ -60,7 +51,9 @@ const NavigationBar = () => {
         >
           <a>About Us</a>
         </div>
-        <div className="navigate">
+        <div className="navigate" onClick={() => {
+          navigate("/profile")
+        }}>
           <i
             class="fa-solid fa-user"
             style={{

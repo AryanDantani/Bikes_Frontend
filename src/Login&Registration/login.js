@@ -66,7 +66,7 @@ function Login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/users/forgot-password",
+        "http://localhost:4000/api/users/send/forgot-password",
         {
           email: forgotEmail.email,
         }

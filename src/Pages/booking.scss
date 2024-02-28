@@ -35,8 +35,9 @@
     }
   }
   .booking-form {
+    margin-top: 5%;
     width: 50%;
-    height: 77%;
+    height: 95%;
     border: 1px solid #000;
     .form-fn {
       background-color: #fbfbfb;
@@ -65,15 +66,19 @@
       width: 300px;
     }
     .form-ph {
-      width: 300px;
-      margin-right: 20px;
+      width: 94%;
+      margin-right: 100px;
+    }
+    .form-lice {
+      width: 50%;
+      margin-top: 25px;
     }
     .form-select {
       background-color: #fbfbfb;
       width: 260px;
     }
     .form-date {
-      margin-right: 70px;
+      margin-right: 18px;
       width: 30%;
     }
     .form-time {
