@@ -28,6 +28,8 @@ const RentalForm = () => {
     ? JSON.parse(localStorage.getItem("user"))._id
     : "";
   const [bikeData, setBikeData] = useState([]);
+  const [error, setError] = useState("");
+  const [errorId, setErrorId] = useState("");
   // const [bikeId, setBikeId] = useState("");
   const [bookingForm, setBookingForm] = useState({
     firstname: "",
@@ -35,10 +37,13 @@ const RentalForm = () => {
     email: "",
     age: "",
     userId: UserData,
+    liceNumber: "",
+    idProof: "",
     phone: "",
     city: "",
     date: "",
-    time: "",
+    startTime: "",
+    endTime: "",
   });
 
   useEffect(() => {
@@ -46,19 +51,52 @@ const RentalForm = () => {
   }, []);
 
   const getBikeById = async () => {
-    let data = await fetch(`http://localhost:4000/api/category/bike/${params.id}`);
+    let data = await fetch(
+      `http://localhost:4000/api/category/bike/${params.id}`
+    );
     data = await data.json();
     // console.log(data, "😍😍");
     setBikeData([data]);
   };
 
   const DecrementStock = async () => {
-    let data = await fetch(`http://localhost:4000/api/category/bike/booked/${params.id}`);
+    let data = await fetch(
+      `http://localhost:4000/api/category/bike/booked/${params.id}`
+    );
     data = await data.json();
     console.log(data, "😍😍");
   };
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setBookingForm({
+      ...bookingForm,
+      liceNumber: value,
+    });
 
+    const regex =
+      /^(([A-Z]{2}[0-9]{2})( )|([A-Z]{2}-[0-9]{2}))((19|20)[0-9][0-9])[0-9]{7}$/;
+    if (!regex.test(value)) {
+      setError("Please enter a valid driving license number");
+    } else {
+      setError("");
+    }
+  };
+
+  const handleChangeIdprof = (e) => {
+    const value = e.target.value;
+    setBookingForm({
+      ...bookingForm,
+      idProof: value,
+    });
+
+    const regex = /^\d{12}$/;
+    if (!regex.test(value)) {
+      setErrorId("Please enter a valid IdProof Number");
+    } else {
+      setErrorId("");
+    }
+  };
 
   console.log(bikeData);
 
@@ -72,7 +110,8 @@ const RentalForm = () => {
       !bookingForm.phone,
       !bookingForm.city,
       !bookingForm.date,
-      !bookingForm.time,
+      !bookingForm.startTime,
+      !bookingForm.endTimeTime,
       !bookingForm.age)
     ) {
       toast("Please fill the form");
@@ -88,16 +127,18 @@ const RentalForm = () => {
         city: bookingForm?.city,
         date: bookingForm?.date,
         phone: bookingForm?.phone,
-        time: bookingForm?.time,
+        startTime: bookingForm?.startTime,
+        endTime: bookingForm?.endTime,
         userId: UserData,
         bikeId: params?.id,
+        licenceNumber: bookingForm?.liceNumber,
       });
-      console.log(response, "asdasdasd")
+      console.log(response, "asdasdasd");
 
       if (response.status === 201) {
         toast.success("Users Booking Is Done Successfully");
         DecrementStock();
-        navigate("/rental");
+        navigate("/bookings");
       } else {
         const errorData = await response.json();
         toast.warning(`Error: ${errorData.message}`);
@@ -117,7 +158,7 @@ const RentalForm = () => {
     return day === 0 || day === 6;
   };
 
-  const handleTimeChange = (time) => {
+  const handleChangeStartTime = (time) => {
     const dateObject = time instanceof Date ? time : new Date(time);
     const formattedTime = dateObject.toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -127,7 +168,21 @@ const RentalForm = () => {
 
     setBookingForm({
       ...bookingForm,
-      time: formattedTime,
+      startTime: formattedTime,
+    });
+  };
+
+  const handleChangeEndTime = (time) => {
+    const dateObject = time instanceof Date ? time : new Date(time);
+    const formattedTime = dateObject.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    setBookingForm({
+      ...bookingForm,
+      endTime: formattedTime,
     });
   };
 
@@ -263,10 +318,10 @@ const RentalForm = () => {
           </div>
           <div>
             <TextField
-              className="form-ph"
               id="filled-basic"
               label="Phone no"
               variant="filled"
+              className="form-ph"
               value={bookingForm?.phone}
               onChange={(e) => {
                 setBookingForm({
@@ -307,7 +362,7 @@ const RentalForm = () => {
             </FormControl>
           </div>
         </div>
-        <div style={{marginTop:"30px"}}>
+        <div style={{ marginTop: "30px" }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               className="form-date"
@@ -318,10 +373,22 @@ const RentalForm = () => {
               shouldDisableDate={(date) => disableWeekends(date)}
             />
             <TimePicker
-              label="With Time Clock"
+              label="Start Time"
               // className="form-time"
-              value={bookingForm?.time}
-              onChange={handleTimeChange}
+              value={bookingForm?.startTime}
+              onChange={handleChangeStartTime}
+              viewRenderers={{
+                hours: renderTimeViewClock,
+                minutes: renderTimeViewClock,
+                seconds: renderTimeViewClock,
+              }}
+            />
+            <span>- To -</span>
+            <TimePicker
+              label="End Time"
+              // className="form-time"
+              value={bookingForm?.endTime}
+              onChange={handleChangeEndTime}
               viewRenderers={{
                 hours: renderTimeViewClock,
                 minutes: renderTimeViewClock,
@@ -329,6 +396,30 @@ const RentalForm = () => {
               }}
             />
           </LocalizationProvider>
+        </div>
+        <div style={{ diplay: "flex" }}>
+          <div>
+            <TextField
+              id="filled-basic"
+              label="Licence Number"
+              className="form-lice"
+              variant="filled"
+              value={bookingForm.liceNumber}
+              onChange={handleChange}
+            />
+            {error && <div style={{ color: "red" }}>{error}</div>}
+          </div>
+          <div>
+            <TextField
+              id="filled-basic"
+              label="ID Proof Number"
+              className="form-lice"
+              variant="filled"
+              value={bookingForm.idProof}
+              onChange={handleChangeIdprof}
+            />
+            {errorId && <div style={{ color: "red" }}>{errorId}</div>}
+          </div>
         </div>
         <br />
         <Button

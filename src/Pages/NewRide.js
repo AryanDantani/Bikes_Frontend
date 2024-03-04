@@ -110,7 +110,7 @@ const NewRide = () => {
                     }}
                     onClick={() => {
                       console.log(item?._id)
-                      navigate("/rental/"+ item?._id)
+                      navigate("/booking/"+ item?._id)
                     }}
                   >
                     Book Now

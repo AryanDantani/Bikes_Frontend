@@ -7,11 +7,11 @@ import Login from './Login&Registration/login';
 import SignUp from "./Login&Registration/SignUp"
 import PrivateRoutes from './PrivateRoute';
 import Rental from './Pages/Rental';
-// import BookingForm from './Pages/BookingForm';
-// import Bookings from './Pages/Bookings';
 import RentalForm from './Pages/RentalForm';
 import OtpInput from './Pages/OtpInput';
 import NewPassword from './Pages/NewPassword';
+import Profile from './Pages/Profile';
+import Users from './Pages/Users';
 
 function App() {
   return (
@@ -25,10 +25,13 @@ function App() {
           <Route path="/checkotp" element={<OtpInput/>}/>
           <Route path="/reset-password" element={<NewPassword/>}/>
           <Route element={<PrivateRoutes/>}>
+          <Route  path="/users" element={<Users />}/>
+          <Route  path="/profile" element={<Profile />}/>
           <Route  path="/aboutus" element={<AboutUs />}/>
           <Route  path="/newride" element={<NewRide />}/>
-          <Route path="/rental/:id" element={<RentalForm/>}/>
-          <Route path="/rental" element={<Rental/>}/>
+          <Route path="/booking/:id" element={<RentalForm/>}/>
+          <Route path="user/bookings/:id" element={<Rental/>}/>
+          <Route path="/bookings" element={<Rental/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
