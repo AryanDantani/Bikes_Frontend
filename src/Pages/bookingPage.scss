@@ -1,9 +1,9 @@
 .page-main {
   width: 100%;
-    align-items: center;
-    justify-content: space-around;
-    display: flex;
-    margin-top: 25px;
+  align-items: center;
+  justify-content: space-around;
+  display: flex;
+  margin-top: 25px;
   .user-detiles {
     display: flex;
     align-items: center;
@@ -21,4 +21,27 @@
       justify-content: center;
     }
   }
+}
+.svg-bg-bk {
+  background-image: url("../Images/booking-confirmed-icon.svg");
+  background-size: cover;
+  width: 26px;
+  height: 26px;
+}
+.svg-bg {
+  background-image: url("../Images/verified-symbol-icon.svg");
+  background-size: cover;
+  width: 26px;
+  height: 26px;
+}
+.svg-bg-cl {
+  background-image: url("../Images/close-red-icon.svg");
+  background-size: cover;
+  width: 26px;
+  height: 26px;
+}
+.css-og52vs-MuiTableCell-root.MuiTableCell-head {
+  background-color: #fff !important;
+  color: #000 !important;
+  font-weight: 600 !important;
 }

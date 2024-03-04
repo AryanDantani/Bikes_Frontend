@@ -1,7 +1,7 @@
 import "./bookingPage.scss";
 import React, { useEffect, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
@@ -52,11 +52,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const Rental = () => {
-  // const navigate = useNavigate();
+  const params = useParams();
+  const navigate = useNavigate();
   const [rentalData, setRentalData] = useState([]);
-  const [data, setData] = useState({
-    rentalId: "",
-    userId: "",
+  const [verifyID, setVerifyId] = useState("");
+  const [isVerify, setVerify] = React.useState(false);
+  const [verifyUID, setVerifyUID] = useState({
+    UID: "",
   });
   const [editData, setEditData] = useState({
     firstname: "",
@@ -121,19 +123,43 @@ const Rental = () => {
     });
   };
 
+  console.log("params", params);
+
   const GetBookingForUser = async () => {
-    let data = await fetch(`http://localhost:4000/api/rental/user/${UserData}`);
+    let data = await fetch(
+      `http://localhost:4000/api/rental/user/bookings/${params?.id}`
+    );
     data = await data.json();
     console.log(data);
     setRentalData(data);
   };
 
-  const GetBookingForAdmin = async () => {
-    let data = await fetch(`http://localhost:4000/api/rental`);
+  const GetBookingByUser = async () => {
+    let data = await fetch(`http://localhost:4000/api/rental/user/${UserData}`);
     data = await data.json();
-    console.log(data.map((i) => i.bike));
     setRentalData(data);
   };
+
+  async function SendUid(event) {
+    if (event) {
+      event.preventDefault();
+    } else {
+      return false;
+    }
+    const UID = verifyUID.UID;
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/rental/genUID/${verifyID}/${UID}`
+      );
+      console.log(response);
+      if (response.status === 201) {
+        toast.success("UID verified Successfully");
+        setVerify(false);
+      }
+    } catch (err) {
+      toast.error(err);
+    }
+  }
 
   async function handleUpdate() {
     try {
@@ -152,7 +178,11 @@ const Rental = () => {
       );
       if (response.status === 200) {
         toast.success("Booking Created Successfully");
-        GetBookingForAdmin();
+        if (User.role === "admin") {
+          GetBookingForUser();
+        } else {
+          GetBookingByUser();
+        }
         setIsOpen(false);
       }
     } catch (err) {
@@ -161,11 +191,11 @@ const Rental = () => {
   }
 
   const DeleteBookings = async (userId, rentalId, bikeId) => {
-    const user = userId
-    const rental = rentalId
-    const bike = bikeId
+    const user = userId;
+    const rental = rentalId;
+    const bike = bikeId;
 
-    console.log(`user${userId} and rental${rentalId}`)
+    console.log(`user${userId} and rental${rentalId}`);
     try {
       const response = await fetch(
         `http://localhost:4000/api/rental/booking/${rental}/${user}/${bike}`,
@@ -179,9 +209,9 @@ const Rental = () => {
       if (response.ok) {
         toast.success("Rental deleted successfully");
         if (User.role === "admin") {
-          GetBookingForAdmin();
-        } else {
           GetBookingForUser();
+        } else {
+          GetBookingByUser();
         }
       } else {
         toast.warning("Failed to delete booking");
@@ -193,9 +223,9 @@ const Rental = () => {
 
   useEffect(() => {
     if (User.role === "user") {
-      GetBookingForUser();
+      GetBookingByUser();
     } else {
-      GetBookingForAdmin();
+      GetBookingForUser();
     }
   }, []);
 
@@ -210,89 +240,245 @@ const Rental = () => {
         )}
       </div>
       <div>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell align="center">No.</StyledTableCell>
-                <StyledTableCell align="center">Name</StyledTableCell>
-                <StyledTableCell align="center">Email</StyledTableCell>
-                <StyledTableCell align="center">Age</StyledTableCell>
-                <StyledTableCell align="center">Phone</StyledTableCell>
-                <StyledTableCell align="center">time</StyledTableCell>
-                <StyledTableCell align="center">Model</StyledTableCell>
-                <StyledTableCell align="center">Rent</StyledTableCell>
-                <StyledTableCell align="center">Mileage</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rentalData.length > 0 &&
-                rentalData.map((row, index) => (
-                  <StyledTableRow key={row.name}>
-                    <StyledTableCell component="th" scope="row">
-                      ({index + 1})
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
-                      {row?.firstname + row?.lastname}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row?.email}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">{row?.age}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row?.phone}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row?.startTime + " To " + row?.endTime}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row?.bike?.name}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row?.bike?.rent}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row?.bike?.mileage}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      <button
-                        onClick={() => {
-                          setIsOpen(true);
-                          setBookingId(row?._id);
-                          setEditData({
-                            firstname: row.firstname,
-                            lastname: row.lastname,
-                            email: row.email,
-                            phone: row.phone,
-                            age: row.age,
-                            date: row.date,
-                            startTime: row.startTime,
-                            endTime: row.endTime,
-                            city: row.city,
-                          });
+        <div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            {User.role === "user" ? (
+              ""
+            ) : (
+              <div>
+                <button
+                  style={{
+                    background: "#fff",
+                    width: "100px",
+                    height: "30px",
+                    border: "none",
+                    color: "#74c0fc",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    navigate("/users");
+                  }}
+                >
+                  <i
+                    className="fa-solid fa-arrow-left"
+                    style={{ color: "#74c0fc", marginRight: "15px" }}
+                  />
+                  Back
+                </button>
+              </div>
+            )}
+
+            {/* <div style={{ ml: "44%", fontSize:"30px" }}>Current Bookings</div> */}
+          </div>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell align="center">No.</StyledTableCell>
+                  <StyledTableCell align="center">Model</StyledTableCell>
+                  <StyledTableCell align="center">time</StyledTableCell>
+                  <StyledTableCell align="center">Date</StyledTableCell>
+                  <StyledTableCell align="center">Rent</StyledTableCell>
+                  <StyledTableCell align="center">Mileage</StyledTableCell>
+                  <StyledTableCell align="center">status</StyledTableCell>
+                  <StyledTableCell align="center">Action</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rentalData.length > 0 &&
+                  rentalData.map((row, index) => (
+                    <StyledTableRow key={row.name}>
+                      <StyledTableCell
+                        component="th"
+                        scope="row"
+                        align="center"
+                      >
+                        {index + 1}.
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row?.bike?.name}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row?.startTime + " To " + row?.endTime}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row?.date}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row?.bike?.rent}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row?.bike?.mileage}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        align="center"
+                        style={{
+                          color: "#4aa146",
+                          fontWeight: "600",
                         }}
                       >
-                        Edit Booking
-                      </button>
-                      <button
-                        onClick={() => {
-                          // handlebooking(row?.bike?._id);
-                          if(User.role === 'admin') {
-                            DeleteBookings(row?.user?._id, row?._id, row?.bike?._id);
-                          }else {
-                            DeleteBookings(row?.user, row?._id);
-                          }
-                        }}
-                      >
-                        Cancel Booking
-                      </button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        {row?.status === "Booked" ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginLeft: "33%",
+                            }}
+                          >
+                            <div className="svg-bg-bk" />
+                            <div style={{ marginLeft: "15px" }}>
+                              {row?.status}
+                            </div>
+                          </div>
+                        ) : (
+                          ""
+                        )}
+
+                        {row?.status === "Completed" ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginLeft: "33%",
+                            }}
+                          >
+                            <div className="svg-bg" />
+                            <div style={{ marginLeft: "15px" }}>
+                              {row?.status}
+                            </div>
+                          </div>
+                        ) : (
+                          ""
+                        )}
+
+                        {row?.status === "Cancel Booking" ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginLeft: "33%",
+                            }}
+                          >
+                            <div className="svg-bg-cl" />
+                            <div style={{ marginLeft: "15px", color: "red" }}>
+                              {row?.status}
+                            </div>
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        <button
+                          style={{ border: "none", cursor: "pointer" }}
+                          onClick={() => {
+                            if (row.status === "Booked") {
+                              setIsOpen(true);
+                              setBookingId(row?._id);
+                              setEditData({
+                                firstname: row.firstname,
+                                lastname: row.lastname,
+                                email: row.email,
+                                phone: row.phone,
+                                age: row.age,
+                                date: row.date,
+                                startTime: row.startTime,
+                                endTime: row.endTime,
+                                city: row.city,
+                              });
+                            } else if (row.status === "Completed") {
+                              toast.warning(
+                                "This booking is already Completed"
+                              );
+                            } else {
+                              toast.warning("This booking is already Cancel");
+                            }
+                          }}
+                        >
+                          <i
+                            class="fa-regular fa-pen-to-square"
+                            style={{
+                              fontSize: "20px",
+                              color: "brown",
+                            }}
+                          />
+                        </button>
+                        <button
+                          style={{
+                            border: "none",
+                            cursor: "pointer",
+                            marginLeft: "20px",
+                          }}
+                          disabled={row.isCompleted}
+                          onClick={() => {
+                            if (row.status === "Booked") {
+                              DeleteBookings(
+                                row?.user,
+                                row?._id,
+                                row?.bike?._id
+                              );
+                            } else if (row.status === "Completed") {
+                              toast.warning(
+                                "This booking is already Completed"
+                              );
+                            } else {
+                              toast.warning("This booking is already Cancel");
+                            }
+                          }}
+                        >
+                          <i
+                            class="fa-solid fa-user-xmark"
+                            style={{
+                              fontSize: "20px",
+                              color: "red",
+                            }}
+                          />
+                        </button>
+                        {User.role === "user" ? (
+                          <button
+                            style={{
+                              border: "none",
+                              cursor: "pointer",
+                              marginLeft: "20px",
+                            }}
+                            disabled={row.isCompleted}
+                            onClick={() => {
+                              if (row.status === "Booked") {
+                                setVerifyId(row?._id);
+                                setVerify(true);
+                              } else if (row.status === "Completed") {
+                                toast.warning(
+                                  "This booking is already Completed"
+                                );
+                              } else {
+                                toast.warning("This booking is already Cancel");
+                              }
+                            }}
+                          >
+                            <i
+                              class="fa-solid fa-users-viewfinder"
+                              style={{
+                                fontSize: "20px",
+                                color: "red",
+                              }}
+                            />
+                          </button>
+                        ) : (
+                          ""
+                        )}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
       </div>
       <Dialog
         open={isOpen}
@@ -495,6 +681,54 @@ const Rental = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <div>
+        <Dialog
+          open={isVerify}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">UID Verification</DialogTitle>
+          <form onSubmit={SendUid}>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                <div>
+                  <TextField
+                    id="filled-basic"
+                    label="UID"
+                    variant="filled"
+                    value={verifyUID.UID}
+                    onChange={(e) => {
+                      setVerifyUID({
+                        ...verifyUID,
+                        UID: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                type="submit"
+                onClick={() => {
+                  setVerify(false);
+                  SendUid();
+                }}
+              >
+                Verify
+              </Button>
+              <Button
+                onClick={() => {
+                  setVerify(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </DialogActions>
+          </form>
+        </Dialog>
+      </div>
     </div>
   );
 };

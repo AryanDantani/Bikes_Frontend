@@ -31,18 +31,28 @@ const NavigationBar = () => {
         {User.role === "user" ? (
           ""
         ) : (
-          <div className="navigate">
-            <a>Garage</a>
+          <div
+            className="navigate"
+            onClick={() => {
+              navigate("/users");
+            }}
+          >
+            <a>Users</a>
           </div>
         )}
-        <div
-          className="navigate"
-          onClick={() => {
-            navigate("/rental");
-          }}
-        >
-          <a>Rental Services</a>
-        </div>
+        {User.role === "admin" ? (
+          ""
+        ) : (
+          <div
+            className="navigate"
+            onClick={() => {
+              navigate("/bookings");
+            }}
+          >
+            <a>Rental Services</a>
+          </div>
+        )}
+
         <div
           className="navigate"
           onClick={() => {
@@ -51,9 +61,12 @@ const NavigationBar = () => {
         >
           <a>About Us</a>
         </div>
-        <div className="navigate" onClick={() => {
-          navigate("/profile")
-        }}>
+        <div
+          className="navigate"
+          onClick={() => {
+            navigate("/profile");
+          }}
+        >
           <i
             class="fa-solid fa-user"
             style={{

@@ -138,7 +138,7 @@ const RentalForm = () => {
       if (response.status === 201) {
         toast.success("Users Booking Is Done Successfully");
         DecrementStock();
-        navigate("/rental");
+        navigate("/bookings");
       } else {
         const errorData = await response.json();
         toast.warning(`Error: ${errorData.message}`);

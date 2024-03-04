@@ -21,14 +21,14 @@
     border-radius: 24px;
     height: 118px;
     width: 115px;
-    border: 1px solid #000;
+    border: 1px solid #f0f0f0;
   }
   .userData {
-    background: black;
+    background: antiquewhite;
     border-bottom-right-radius: 55px;
     height: 113px;
     width: 65%;
-    color: #fff;
+    color: #000;
     margin-left: 22px;
   }
 }
@@ -44,11 +44,17 @@
   position: relative;
   top: -10%;
   margin-top: 21px;
-  color: #fff;
+  color: #000;
   margin-left: 55px;
-  background: #000;
+  background: antiquewhite;
   .coins {
     background-image: url("../Images/coin.svg");
+    width: 33px;
+    height: 30px;
+    background-size: cover;
+  }
+  .voucher {
+    background-image: url("../Images/voucher-coupon-svgrepo-com.svg");
     width: 33px;
     height: 30px;
     background-size: cover;
