@@ -53,11 +53,30 @@
         font-size: 18px;
         font-family: auto;
       }
+      .reg-label-select {
+        height: 40px;
+        width: 150px;
+        color: #fff;
+        font-family: auto;
+      }
       .form-control {
         border-radius: 8px;
         padding: 7px;
         width: 350px;
         height: 35px;
+        margin-right: 30px;
+        background: transparent;
+        color: #fff;
+        border: 1px solid #fff;
+        .options {
+          background: #000 !important;
+        }
+      }
+      .form-control-select {
+        border-radius: 8px;
+        padding: 7px;
+        width: 180px;
+        height: 45px;    
         margin-right: 30px;
         background: transparent;
         color: #fff;
