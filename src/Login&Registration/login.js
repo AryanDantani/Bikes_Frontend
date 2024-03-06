@@ -28,23 +28,18 @@ function Login() {
         }
       );
 
-      if (response.status === 201) {
+      console.log(response)
+
+      if (response.data.statusCode === 200) {
         console.log(response?.data);
         localStorage.setItem("user", JSON.stringify(response?.data?.data));
         localStorage.setItem("tokan", response.data.token);
-        if (response?.data?.data?.role === "admin") {
-          toast.success("Login in Successfully");
-          setTimeout(() => {
-            navigate("/aboutus");
-          }, [5000]);
-        } else {
-          toast.success("Login in Successfully");
-          setTimeout(() => {
-            navigate("/aboutus");
-          }, [5000]);
-        }
+        toast.success("Login in Successfully");
+        setTimeout(() => {
+          navigate("/aboutus");
+        }, [5000]);
       } else {
-        alert(`Error: ${response.data.message}`);
+        toast.error(response.data.message);
       }
     } catch (err) {
       console.log(err);
@@ -58,7 +53,7 @@ function Login() {
       return false;
     }
 
-    localStorage.setItem("userEmail", JSON.stringify(forgotEmail.email))
+    localStorage.setItem("userEmail", JSON.stringify(forgotEmail.email));
 
     if (!forgotEmail.email) {
       return false;
@@ -79,7 +74,7 @@ function Login() {
           email: "",
         });
         setIsFogot(false);
-        navigate("/checkotp")
+        navigate("/checkotp");
       } else {
         alert(`Error: ${response.data.message}`);
       }

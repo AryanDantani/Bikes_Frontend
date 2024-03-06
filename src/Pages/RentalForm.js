@@ -230,7 +230,7 @@ const RentalForm = () => {
                         <p>{item?.owner}</p>
                         <p>{item?.name}</p>
                         <p>{item?.km}</p>
-                        <p>{item?.available}</p>
+                        <p>{item?.date}</p>
                         <p>{item?.rent}</p>
                       </div>
                     </div>

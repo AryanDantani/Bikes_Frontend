@@ -1,12 +1,28 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./newride.scss";
+import AddRentalBike from "./AddRentalBike";
 
 const NewRide = () => {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
+  const [imageUrl, setImageUrl] = useState("");
+  const [rentalData, setRentalData] = useState({
+    userName: "",
+    email: "",
+    contact: "",
+    type: "",
+    engine: "",
+    date: "",
+    owner: "",
+    mileage: "",
+    rent: "",
+    image: "",
+  });
   const [selected, setSelected] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [isData, setIsData] = useState(false);
 
   useEffect(() => {
@@ -17,18 +33,78 @@ const NewRide = () => {
     let result = await fetch("http://localhost:4000/api/category");
     result = await result.json();
     setData(result);
-    console.log(result)
+    console.log(result);
   };
+
+  async function AddBikeForRent(event) {
+    event.preventDefault();
+
+    if (
+      (!rentalData.userName,
+      !rentalData.email,
+      !rentalData.contact,
+      !rentalData.type,
+      !rentalData.engine,
+      !rentalData.date,
+      !rentalData.owner,
+      !rentalData.rent,
+      !rentalData.name,
+      !rentalData.mileage,
+      !rentalData.km,
+      !rentalData.image)
+    ) {
+      return false;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/add-rental",
+        {
+          userName: rentalData.userName,
+          email: rentalData.email,
+          contact: rentalData.contact,
+          type: rentalData.type,
+          engine: rentalData.engine,
+          date: rentalData.date,
+          owner: rentalData.owner,
+          rent: rentalData.rent,
+          name: rentalData.name,
+          mileage: rentalData.mileage,
+          km: rentalData.km,
+          image: imageUrl,
+        }
+      );
+      if (response.status) {
+        setIsOpen(false);
+        GetAllCategory()
+        console.log(response?.data);
+      } else {
+        // toast.error(response.data.message);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <>
-      <h1
-        style={{
-          marginBottom: "30px",
-        }}
-      >
-        Select Your Riding Type
-      </h1>
+      <div>
+        <h1
+          style={{
+            marginBottom: "30px",
+          }}
+        >
+          Select Your Riding Type
+        </h1>
+        <button
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
+          Add Your Bike
+        </button>
+      </div>
+
       <hr />
       <div className="category">
         {data?.map((item) => {
@@ -55,6 +131,14 @@ const NewRide = () => {
           );
         })}
       </div>
+      <AddRentalBike
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        rentalData={rentalData}
+        setImageUrl={setImageUrl}
+        setRentalData={setRentalData}
+        AddBikeForRent={AddBikeForRent}
+      />
       <hr />
 
       {isData ? (
@@ -89,7 +173,7 @@ const NewRide = () => {
                     <p>{item.name}</p>
                     <p>{item.stock}</p>
                     <p>{item.km}</p>
-                    <p>{item.available}</p>
+                    <p>{item.date}</p>
                     <p>{item.rent}</p>
                   </div>
                 </div>
@@ -109,8 +193,8 @@ const NewRide = () => {
                       cursor: "pointer",
                     }}
                     onClick={() => {
-                      console.log(item?._id)
-                      navigate("/booking/"+ item?._id)
+                      console.log(item?._id);
+                      navigate("/booking/" + item?._id);
                     }}
                   >
                     Book Now

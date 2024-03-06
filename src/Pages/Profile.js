@@ -1,12 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import "./profile.scss";
-import { styled } from "@mui/material/styles";
-import { tableCellClasses } from "@mui/material/TableCell";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { TableRow, TableCell } from "@mui/material";
 import "./cardCarousel.scss";
+import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -14,16 +12,37 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate } from "react-router-dom";
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
 
 const Profile = () => {
   const userData = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : "";
-
+  const navigate = useNavigate();
   const [usersData, setUsersData] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [rewardCards, setRewardCards] = useState([]);
+  const [deleteData, setDeleteData] = useState({
+    email: "",
+    password: "",
+  });
   const [noReward, setNoReward] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const GetUserRewardByID = async () => {
     const userId = userData._id;
@@ -36,6 +55,44 @@ const Profile = () => {
     }
     console.log(data.length > 0 ? true : false);
     setRewardCards(data);
+  };
+
+  const DeleteAccount = async () => {
+    const Mail = deleteData.email;
+    const Password = deleteData.password;
+
+    if (userData.email !== Mail) {
+      toast.warning("Please Provide Your Valid Email");
+    } else {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/users/${Mail}/password`,
+          {
+            method: "POST", // Correct method
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ password: Password }), // Stringify body data
+          }
+        );
+        console.log("Delete Response:", response);
+
+        // Assuming the API returns a status code 204 for successful deletion
+        if (response.status === 201) {
+          toast.success("Account Deleted successfully");
+          setTimeout(() => {
+            navigate("/");
+            localStorage.removeItem("tokan");
+            localStorage.removeItem("user");
+          }, [5000]);
+        } else {
+          toast.warning("Failed To Delete Account");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Failed to delete account. Please try again.");
+      }
+    }
   };
 
   const ClaimReward = async (rewardId) => {
@@ -77,25 +134,31 @@ const Profile = () => {
     GetUserByID();
   }, []);
 
+  console.log(currentSlide, "");
+
   return (
     <div>
-      {/* <div className="bg-3"> */}
       <ToastContainer />
-      <div className="Profile">
-        <div className="logo">
-          <i
-            class="fa-solid fa-user"
-            style={{
-              fontSize: "119px",
-            }}
-          />
-        </div>
-        <div className="userData">
+      <div className="Pro-bg">
+        <div className="main-box">
           <div>
-            <div style={{ marginTop: "12px" }}>User Name: {usersData.name}</div>
-            <div>Email: {usersData.email}</div>
-            <div>Role: {usersData.role}</div>
-            <div>Contact No: {userData.phone}</div>
+            <button
+              className="settings"
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              <i class="fa-solid fa-gear" />
+            </button>
+          </div>
+          <div className="profile-bg">
+            <div className="profile"></div>
+            <h3 className="userName">{userData.name}</h3>
+            <div>
+              <button className="upload" type="file">
+                <i class="fa-solid fa-plus" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -109,7 +172,7 @@ const Profile = () => {
         <div style={{ display: "flex", alignItems: "center" }}>
           <div className="voucher" />
           <div style={{ marginRight: "10px" }}>:</div>
-          <div>{rewardCards.length}</div>
+          <div>{rewardCards?.length ? rewardCards?.length : "0"}</div>
         </div>
       </div>
       <div>
@@ -123,6 +186,7 @@ const Profile = () => {
                   prev === rewardCards.length - 3 ? 0 : prev + 1
                 );
               }}
+              disabled={currentSlide === 0}
             >
               {"<"}
             </button>
@@ -133,7 +197,7 @@ const Profile = () => {
           <div className="slider-container">
             {rewardCards.length > 0 &&
               rewardCards
-                .slice(currentSlide, currentSlide + 3)
+                .slice(currentSlide, currentSlide + 4)
                 .map((reward, index) => (
                   <Card key={index} sx={{ maxWidth: 345 }} className="card">
                     <CardMedia className="card-media" sx={{ height: 140 }}>
@@ -216,6 +280,7 @@ const Profile = () => {
                   prev === 0 ? rewardCards.length - 3 : prev - 1
                 );
               }}
+              disabled={currentSlide + 3 >= rewardCards.length}
             >
               {">"}
             </button>
@@ -224,8 +289,90 @@ const Profile = () => {
           )}
         </div>
       </div>
+      <div>
+        <BootstrapDialog
+          onClose={() => {
+            setOpen(false);
+          }}
+          aria-labelledby="customized-dialog-title"
+          open={open}
+        >
+          <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+            Delete Account Verification
+          </DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={() => {
+              setOpen(false);
+            }}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <form>
+            <DialogContent dividers>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div>
+                  <Typography>Email</Typography>
+                </div>
+                <input
+                  value={deleteData.email}
+                  onChange={(e) => {
+                    setDeleteData({
+                      ...deleteData,
+                      email: e.target.value,
+                    });
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div>
+                  <Typography>Password</Typography>
+                </div>
+                <input
+                  value={deleteData.password}
+                  onChange={(e) => {
+                    setDeleteData({
+                      ...deleteData,
+                      password: e.target.value,
+                    });
+                  }}
+                />
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                autoFocus
+                onClick={() => {
+                  setOpen(false);
+                  DeleteAccount();
+                }}
+              >
+                Save changes
+              </Button>
+            </DialogActions>
+          </form>
+        </BootstrapDialog>
+      </div>
     </div>
   );
 };
-
 export default Profile;

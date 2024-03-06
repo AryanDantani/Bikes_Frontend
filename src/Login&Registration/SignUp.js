@@ -13,6 +13,7 @@ function SignUp() {
     email: "",
     phone: "",
     password: "",
+    role:""
   });
 
   async function save(event) {
@@ -22,7 +23,8 @@ function SignUp() {
       (!registerData.name,
       !registerData.email,
       !registerData.phone,
-      !registerData.password)
+      !registerData.password,
+      !registerData.role)
     ) {
       alert("Please fill the form");
       return false;
@@ -36,11 +38,16 @@ function SignUp() {
           email: registerData.email,
           phone: registerData.phone,
           password: registerData.password,
+          role: registerData.role
         }
       );
 
       if (response.status === 201) {
+        console.log(response)
         toast.success("User Registration Successfully");
+        setTimeout(() => {
+          navigate('/')
+        }, [5000])
       } else {
         const errorData = await response.json();
         toast.warning(`Error: ${errorData.message}`);
@@ -178,6 +185,31 @@ function SignUp() {
                   />
                 </div>
               </div>
+
+              <div className="reg-group">
+                <div className="reg-label-select">
+                  <label>User Type</label>
+                </div>
+                <div>
+                  <select
+                    className="form-control-select"
+                    placeholder="Select User type"
+                    autoComplete="off"
+                    value={registerData.role}
+                    onChange={(event) => {
+                      setRegisterData({
+                        ...registerData,
+                        role: event.target.value,
+                      });
+                    }}
+                  >
+                    <option className="options">Select User Type</option>
+                    <option className="options" value={"user"}>User</option>
+                    <option className="options" value={"owner"}>Owner</option>
+                  </select>
+                </div>
+              </div>
+              
 
               <div className="reg-btn">
                 <button type="submit" onClick={save}>

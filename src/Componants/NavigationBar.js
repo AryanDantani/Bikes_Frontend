@@ -1,6 +1,7 @@
 import React from "react";
 import "./navigation.scss";
 import { useNavigate } from "react-router-dom";
+import SideBar from "./Drawer";
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const NavigationBar = () => {
     <div>
       <div className="nav-main">
         <div className="nav-img">
-          <i className="fa-solid fa-bars" />
+          <SideBar />
         </div>
         <div className="nav-logo">
           <div className="nav-bac">
@@ -28,7 +29,7 @@ const NavigationBar = () => {
         >
           <a>New ride</a>
         </div>
-        {User.role === "user" ? (
+        {User.role === "user" || User.role === "owner" ? (
           ""
         ) : (
           <div
