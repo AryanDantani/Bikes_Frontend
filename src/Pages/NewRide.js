@@ -1,9 +1,15 @@
-/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./newride.scss";
 import AddRentalBike from "./AddRentalBike";
+import dayjs from "dayjs";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import CardMedia from "@mui/material/CardMedia";
+import Button from "@mui/material/Button";
 
 const NewRide = () => {
   const [data, setData] = useState([]);
@@ -24,6 +30,11 @@ const NewRide = () => {
   const [selected, setSelected] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isData, setIsData] = useState(false);
+  const User = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : "";
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [dotIndex, setDotIndex] = useState(0);
 
   useEffect(() => {
     GetAllCategory();
@@ -33,25 +44,29 @@ const NewRide = () => {
     let result = await fetch("http://localhost:4000/api/category");
     result = await result.json();
     setData(result);
-    console.log(result);
+    setSelected(result[0].bikes);
   };
 
   async function AddBikeForRent(event) {
     event.preventDefault();
 
+    const userId = User._id;
+
     if (
-      (!rentalData.userName,
-      !rentalData.email,
-      !rentalData.contact,
-      !rentalData.type,
-      !rentalData.engine,
-      !rentalData.date,
-      !rentalData.owner,
-      !rentalData.rent,
-      !rentalData.name,
-      !rentalData.mileage,
-      !rentalData.km,
-      !rentalData.image)
+      !(
+        rentalData.userName &&
+        rentalData.email &&
+        rentalData.contact &&
+        rentalData.type &&
+        rentalData.engine &&
+        rentalData.date &&
+        rentalData.owner &&
+        rentalData.rent &&
+        rentalData.name &&
+        rentalData.mileage &&
+        rentalData.km &&
+        rentalData.image
+      )
     ) {
       return false;
     }
@@ -60,6 +75,7 @@ const NewRide = () => {
       const response = await axios.post(
         "http://localhost:4000/api/add-rental",
         {
+          userId: userId,
           userName: rentalData.userName,
           email: rentalData.email,
           contact: rentalData.contact,
@@ -76,61 +92,62 @@ const NewRide = () => {
       );
       if (response.status) {
         setIsOpen(false);
-        GetAllCategory()
-        console.log(response?.data);
+        GetAllCategory();
       } else {
-        // toast.error(response.data.message);
+        console.log("Error:", response.data.message);
       }
     } catch (err) {
-      console.log(err);
+      console.log("Error:", err);
     }
   }
 
-  return (
-    <>
-      <div>
-        <h1
-          style={{
-            marginBottom: "30px",
-          }}
-        >
-          Select Your Riding Type
-        </h1>
-        <button
-          onClick={() => {
-            setIsOpen(true);
-          }}
-        >
-          Add Your Bike
-        </button>
-      </div>
+  const handleDotClick = (index) => {
+    setCurrentSlide(index * 4);
+    setDotIndex(index);
+  };
 
-      <hr />
+  return (
+    <div className="new-ride-main">
+      <div className="header">
+        <h1>𝑺𝒆𝒍𝒆𝒄𝒕 𝒀𝒐𝒖𝒓 𝑹𝒊𝒅𝒊𝒏𝒈 𝑻𝒚𝒑𝒆</h1>
+        {User.role === "owner" && (
+          <button
+            className="add-bike"
+            onClick={() => {
+              setIsOpen(true);
+            }}
+          >
+            <i class="fa-solid fa-plus" style={{ marginRight: "10px" }} />
+            𝑨𝒅𝒅 𝒀𝒐𝒖𝒓 𝑩𝒊𝒌𝒆
+          </button>
+        )}
+      </div>
       <div className="category">
-        {data?.map((item) => {
-          return (
-            <div className="category-main" key={item._id}>
-              <div
-                className="category-card"
-                onClick={() => {
-                  if (item?.bikes?.length === 0) {
-                    setIsData(true);
-                    setSelected([]);
-                  } else {
-                    setIsData(false);
-                    setSelected(item?.bikes);
-                  }
-                }}
-              >
-                <div className="category-img">
-                  <img src={item?.image} />
-                  <h3>{item?.title}</h3>
-                </div>
+        {data?.map((item) => (
+          <div
+            key={item._id}
+            className={`category-main ${
+              selected._id === item._id ? "selected" : ""
+            }`}
+            onClick={() => {
+              if (item?.bikes?.length === 0) {
+                setIsData(true);
+                setSelected([]);
+              } else {
+                setIsData(false);
+                setSelected(item?.bikes);
+              }
+            }}
+          >
+            <div className="category-card">
+              <div className="category-img">
+                <h3>{item?.title}</h3>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
+
       <AddRentalBike
         isOpen={isOpen}
         setIsOpen={setIsOpen}
@@ -139,73 +156,102 @@ const NewRide = () => {
         setRentalData={setRentalData}
         AddBikeForRent={AddBikeForRent}
       />
-      <hr />
 
-      {isData ? (
-        <h1>Vehicle Is Not Available Yet</h1>
-      ) : (
-        <h1>Choose Any Available Rides</h1>
-      )}
-      <div className="category1">
-        {selected.map((item) => {
-          return (
-            <div className="category-main1" key={item?._id}>
-              <div className="category-card1">
-                <div className="category-img1">
-                  <img src={item?.image} />
-                </div>
-                <hr />
-                <div className="category-details1">
-                  <div className="category-lab1">
-                    <p>Engine:</p>
-                    <p>Mileage:</p>
-                    <p>Owner:</p>
-                    <p>Model:</p>
-                    <p>left:</p>
-                    <p>Km / Run:</p>
-                    <p>Available:</p>
-                    <p>Price For Rent:</p>
-                  </div>
-                  <div className="category-val1">
-                    <p>{item.engine}</p>
-                    <p>{item.mileage}</p>
-                    <p>{item.owner}</p>
-                    <p>{item.name}</p>
-                    <p>{item.stock}</p>
-                    <p>{item.km}</p>
-                    <p>{item.date}</p>
-                    <p>{item.rent}</p>
-                  </div>
-                </div>
-                <hr />
-                <div>
-                  <button
-                    style={{
-                      width: "40%",
-                      marginTop: "10px",
-                      marginRight: "10px",
-                      height: "30px",
-                      marginBottom: "5px",
-                      backgroundColor: "#000",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "12px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      console.log(item?._id);
-                      navigate("/booking/" + item?._id);
-                    }}
-                  >
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      <div className="ride-selection-header">
+        {isData ? (
+          <h1>𝑽𝒆𝒉𝒊𝒄𝒍𝒆 𝑰𝒔 𝑵𝒐𝒕 𝑨𝒗𝒂𝒊𝒍𝒂𝒃𝒍𝒆 𝒀𝒆𝒕</h1>
+        ) : (
+          <h1>𝐶ℎ𝑜𝑜𝑠𝑒 𝐴𝑛𝑦 𝐴𝑣𝑎𝑖𝑙𝑎𝑏𝑙𝑒 𝑅𝑖𝑑𝑒𝑠</h1>
+        )}
       </div>
-    </>
+
+      <div className="content-sec">
+        <div className="slider-container">
+          {selected.length > 0 &&
+            selected
+              .slice(currentSlide, currentSlide + 4)
+              .map((item, index) => (
+                <Card key={index} sx={{ maxWidth: 345 }} className="card">
+                  <CardMedia className="card-media" sx={{ height: 140 }}>
+                    <img src={item.image} alt={item.name} />
+                  </CardMedia>
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {item.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "32%", fontWeight: "700" }}>
+                        Engine:
+                      </span>
+                      {item.engine}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "27%", fontWeight: "700" }}>
+                        Mileage:
+                      </span>
+                      {item.mileage}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "31%", fontWeight: "700" }}>
+                        Owner:
+                      </span>
+                      {item.owner}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "14%", fontWeight: "700" }}>
+                        Model:
+                      </span>
+                      {item.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "37%", fontWeight: "700" }}>
+                        Available:
+                      </span>
+                      {item.stock}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "25%", fontWeight: "700" }}>
+                        Km / Run:
+                      </span>
+                      {item.km}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <span style={{ paddingRight: "13%", fontWeight: "700" }}>
+                        Price For Rent:
+                      </span>
+                      {item.rent}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      style={{ background: "brown", color: "#fff" }}
+                      onClick={() => {
+                        console.log(item?._id);
+                        navigate("/booking/" + item?._id);
+                      }}
+                    >
+                      Book Now
+                    </Button>
+                  </CardActions>
+                </Card>
+              ))}
+        </div>
+
+        <div className="dot-container">
+          {Array(Math.ceil(selected.length / 4))
+            .fill()
+            .map((_, index) => (
+              <span
+                key={index}
+                className={index === dotIndex ? "dot active" : "dot"}
+                onClick={() => handleDotClick(index)}
+              ></span>
+            ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

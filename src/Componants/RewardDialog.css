@@ -1,0 +1,49 @@
+.MuiDialog-paper {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.MuiDialogTitle-root {
+  background-color: #93b0b98f;
+  font-family: emoji !important;
+  padding: 16px;
+  /* border-radius: 10px 10px 0 0; */
+  display: flex;
+  font-weight: 800 !important;
+  align-items: center;
+}
+
+.MuiDialogTitle-root h2 {
+  margin: 0;
+  color: #333;
+  margin-left: 16px;
+}
+
+/* .MuiDialogTitle-root img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+  } */
+
+.MuiDialogContent-root {
+  padding: 24px;
+}
+
+.MuiDialogActions-root {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.Close-Icon {
+    background: url('https://w7.pngwing.com/pngs/895/550/png-transparent-black-and-white-logo-computer-icons-symbol-free-of-close-button-icon-miscellaneous-trademark-sign-thumbnail.png') !important;
+    background-size: cover !important;
+    color: #000 !important;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: -47px;
+    left: 90%;
+}
