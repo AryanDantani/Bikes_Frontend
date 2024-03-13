@@ -1,65 +1,76 @@
 .main-divs {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   .form-div {
     display: flex;
     align-items: center;
     justify-content: start;
     margin-bottom: 15px;
+    .UN-Field div div {
+      margin-left: 40px;
+    }
     .UN-Field div div input {
       height: 8px;
       width: 285px;
     }
+    .UN-Field-Select div {
+      height: 45px;
+      // width: 310px;
+      margin-left: 19px;
+    }
     .SL-Field div {
-      width: 199px;
+      height: 45px;
+      width: 315px;
+      margin-left: 15px;
     }
     .Sl-OW div {
       width: 222px;
+      width: 315px;
+      margin-left: 40px;
     }
   }
   .side-Image {
     background-image: url("../Images/bg-img.jpg");
     background-size: cover;
-    width: 349px;
-    height: 550px;
-    border-radius: 23px;
+    width: 395px;
+    height: 722px;
+    // border-radius: 23px;
   }
 }
 
 .fileUpload {
-    position: relative;
-    overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 .fileUpload input.upload {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0;
-    padding: 0;
-    font-size: 20px;
-    cursor: pointer;
-    opacity: 0;
-    filter: alpha(opacity=0);
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0;
+  filter: alpha(opacity=0);
 }
 
-.btn--browse{
-    border: 1px solid #fff7f7;
-    border-left: 0;
-    border-radius: 0 2px 2px 0;
-    background-color: #ccc;
-    color: black;
-    height: 23px;
-    padding: 10px 14px;
+.btn--browse {
+  border: 1px solid #fff7f7;
+  border-left: 0;
+  border-radius: 0 2px 2px 0;
+  background-color: #ccc;
+  color: black;
+  height: 23px;
+  padding: 10px 14px;
 }
 
-.f-input{
-	height: 42px;
-    background-color: white;
-    border: 1px solid gray;
-    float: left;
-    padding: 0 14px;
+.f-input {
+  height: 42px;
+  background-color: white;
+  border: 1px solid gray;
+  float: left;
+  padding: 0 14px;
 }
-
 
 // html { margin: 50px;}

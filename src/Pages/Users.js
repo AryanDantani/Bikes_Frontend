@@ -41,7 +41,7 @@ export default function User() {
   const GetAllUser = async () => {
     let data = await fetch(`http://localhost:4000/api/users`);
     data = await data.json();
-    setUsersData(data);
+    setUsersData(data.user);
   };
 
   return (

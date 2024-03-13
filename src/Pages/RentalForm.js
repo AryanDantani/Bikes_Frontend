@@ -56,7 +56,7 @@ const RentalForm = () => {
     );
     data = await data.json();
     // console.log(data, "😍😍");
-    setBikeData([data]);
+    setBikeData([data.bike]);
   };
 
   const DecrementStock = async () => {
@@ -100,53 +100,98 @@ const RentalForm = () => {
 
   console.log(bikeData);
 
+  const validateForm = () => {
+    if (
+      !bookingForm.firstname ||
+      !bookingForm.lastname ||
+      !bookingForm.email ||
+      !bookingForm.phone ||
+      !bookingForm.city ||
+      !bookingForm.date ||
+      !bookingForm.startTime ||
+      !bookingForm.endTime ||
+      !bookingForm.age ||
+      !bookingForm.liceNumber ||
+      !bookingForm.idProof
+    ) {
+      toast.error("Please fill all the fields");
+      return false;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(bookingForm.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    // Validate age as a number
+    if (isNaN(bookingForm.age)) {
+      toast.error("Please enter a valid age");
+      return false;
+    }
+
+    // Validate phone number
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(bookingForm.phone)) {
+      toast.error("Please enter a valid phone number");
+      return false;
+    }
+
+    // Validate driving license number format
+    const licenseRegex =
+      /^(([A-Z]{2}[0-9]{2})( )|([A-Z]{2}-[0-9]{2}))((19|20)[0-9][0-9])[0-9]{7}$/;
+    if (!licenseRegex.test(bookingForm.liceNumber)) {
+      toast.error("Please enter a valid driving license number");
+      return false;
+    }
+
+    // Validate ID proof number
+    const idProofRegex = /^\d{12}$/;
+    if (!idProofRegex.test(bookingForm.idProof)) {
+      toast.error("Please enter a valid ID proof number");
+      return false;
+    }
+
+    return true;
+  };
+
   async function save(event) {
     event.preventDefault();
 
-    if (
-      (!bookingForm.firstname,
-      !bookingForm.lastname,
-      !bookingForm.email,
-      !bookingForm.phone,
-      !bookingForm.city,
-      !bookingForm.date,
-      !bookingForm.startTime,
-      !bookingForm.endTimeTime,
-      !bookingForm.age)
-    ) {
-      toast("Please fill the form");
-      return false;
+    if (!validateForm()) {
+      return;
     }
 
     try {
       const response = await axios.post("http://localhost:4000/api/rental", {
-        firstname: bookingForm?.firstname,
-        lastname: bookingForm?.lastname,
-        age: bookingForm?.age,
-        email: bookingForm?.email,
-        city: bookingForm?.city,
-        date: bookingForm?.date,
-        phone: bookingForm?.phone,
-        startTime: bookingForm?.startTime,
-        endTime: bookingForm?.endTime,
+        firstname: bookingForm.firstname,
+        lastname: bookingForm.lastname,
+        age: bookingForm.age,
+        email: bookingForm.email,
+        city: bookingForm.city,
+        date: bookingForm.date,
+        phone: bookingForm.phone,
+        startTime: bookingForm.startTime,
+        endTime: bookingForm.endTime,
         userId: UserData,
-        bikeId: params?.id,
-        licenceNumber: bookingForm?.liceNumber,
+        bikeId: params.id,
+        licenceNumber: bookingForm.liceNumber,
       });
-      console.log(response, "asdasdasd");
+
+      console.log(response)
 
       if (response.status === 201) {
-        toast.success("Users Booking Is Done Successfully");
+        toast.success("Booking successful!");
         DecrementStock();
         navigate("/bookings");
       } else {
         const errorData = await response.json();
         toast.warning(`Error: ${errorData.message}`);
       }
-    } catch (err) {
-      toast.error(
-        "An error occurred. Please check the console for more details."
-      );
+    } catch (error) {
+      console.error("Error saving booking:", error);
+      toast.error("An error occurred while saving the booking.");
     }
   }
 
@@ -205,7 +250,7 @@ const RentalForm = () => {
       <ToastContainer />
       <div className="category2">
         <>
-          {bikeData !== null &&
+          {bikeData.length !== null &&
             bikeData?.map((item) => {
               return (
                 <div className="category-main2" key={item?.name}>

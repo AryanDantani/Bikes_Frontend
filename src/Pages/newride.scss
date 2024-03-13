@@ -1,71 +1,234 @@
-.category {
-  display: flex;
-  width: 100%;
-
-  .category-main {
-    width: 100%;
+.new-ride-main {
+  font-family: Arial, sans-serif;
+  padding: 40px;
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
-    flex-wrap: wrap;
-    .category-card {
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .add-bike {
+      background-color: brown; /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 15px;
-      border: 5px solid;
-      margin-left: 5px;
-      background-color: #000;
-      border-radius: 5px;
-      .category-img {
-        img {
-          width: 95%;
-          height: 200px;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.3s, background-color 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
+    
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.5s ease-out;
+        z-index: -1;
+      }
+    
+      &:hover::before {
+        transform: translate(-50%, -50%) scale(2);
+      }
+    
+      &:hover {
+        color: #fff; /* White */
+        background-color: brown; /* Darker green */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Increase shadow size */
+      }
+    
+      .bike-animation {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(100%);
+        animation: rideBike 1s forwards;
+        z-index: -1;
+      }
+    
+      @keyframes rideBike {
+        0% {
+          transform: translateX(-50%) translateY(100%);
         }
-        h3 {
-          color: #fff;
-          font-family: auto;
+        100% {
+          transform: translateX(-50%) translateY(-100%);
         }
       }
-      .category-details {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        .category-lab {
-          margin-right: 15px;
+    }
+    
+  }
+
+  .category {
+    display: flex;
+    // flex-wrap: wrap;
+    gap: 20px;
+  
+    .category-main {
+      width: calc(33.33% - 20px);
+      background-color: #000;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+      font-family: emoji;
+  
+      // Add conditional styling for selected item
+      .category-main.selected {
+        background-color: red !important;
+      }
+  
+      .category-card {
+        cursor: pointer;
+      }
+  
+      .category-img {
+        text-align: center;
+        h3 {
+          font-size: 18px;
         }
       }
     }
   }
-}
-.category1 {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  margin-top: 40px;
-  margin-left: 20px;
-  .category-main1 {
-    width: 30%;
-    margin-bottom: 40px;
-    .category-card1 {
-      cursor: pointer;
-      width: 55%;
-      border: 9px solid;
-      padding: 10px;
-      border-radius: 15px;
-      cursor: pointer;
-      cursor: pointer;
-      .category-img1 {
+  
+  
+
+  .ride-selection-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    h1 {
+      font-size: 20px;
+    }
+
+    .carousel-controls {
+      display: flex;
+      gap: 10px;
+
+      .arrow {
+        background-color: #ddd;
+        border: none;
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #ccc;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+
+  .content-sec {
+    background-color: #cbcbcb91;
+    padding: 10px;
+  }
+
+  .slider-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+    margin-top: 20px;
+
+    .card {
+      width: calc(25% - 20px);
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 4px 8px 0 	rgb(165, 42, 42), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+
+      .card-media {
+        height: 140px;
         img {
-          width: 100%;
-          height: 200px;
+          width: 65%;
+          height: 108%;
+          object-fit: cover;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
         }
       }
-      .category-details1 {
+
+      .card-content {
+        padding: 20px;
+        h5 {
+          font-size: 18px;
+          margin-bottom: 10px;
+        }
+        p {
+          margin-bottom: 5px;
+          font-size: 14px;
+          color: #666;
+        }
+      }
+
+      .card-actions {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 10px;
-        .category-lab1 {
-          margin-right: 15px;
+        justify-content: flex-end;
+        padding: 10px 20px;
+        button {
+          background-color: #4caf50;
+          color: #fff;
+          border: none;
+          padding: 8px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #45a049;
+          }
         }
       }
+    }
+  }
+
+  .dot-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      background-color: #ccc;
+      border-radius: 50%;
+      margin: 0 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #aaa;
+      }
+    }
+
+    .active {
+      background-color: #000;
     }
   }
 }

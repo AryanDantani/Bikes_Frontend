@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import "./bookingPage.scss";
 import React, { useEffect, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -11,7 +12,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
 import "./rentalFrom.scss";
+import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
 import {
   Dialog,
   DialogTitle,
@@ -30,6 +33,7 @@ import {
   Paper,
 } from "@mui/material";
 import { tableCellClasses } from "@mui/material/TableCell";
+import RewordDialog from "../Componants/RewordDialog";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -72,6 +76,7 @@ const Rental = () => {
   });
   const [bookingId, setBookingId] = useState("");
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isReward, setIsReward] = React.useState(false);
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -123,21 +128,20 @@ const Rental = () => {
     });
   };
 
-  console.log("params", params);
-
   const GetBookingForUser = async () => {
     let data = await fetch(
       `http://localhost:4000/api/rental/user/bookings/${params?.id}`
     );
     data = await data.json();
-    console.log(data);
+    console.log(data, "UserData");
     setRentalData(data);
   };
 
   const GetBookingByUser = async () => {
     let data = await fetch(`http://localhost:4000/api/rental/user/${UserData}`);
     data = await data.json();
-    setRentalData(data);
+    setRentalData(data.rentalData);
+    // console.log(data)
   };
 
   async function SendUid(event) {
@@ -155,6 +159,7 @@ const Rental = () => {
       if (response.status === 201) {
         toast.success("UID verified Successfully");
         setVerify(false);
+        setIsReward(true);
       }
     } catch (err) {
       toast.error(err);
@@ -176,8 +181,8 @@ const Rental = () => {
           city: editData.city,
         }
       );
-      if (response.status === 200) {
-        toast.success("Booking Created Successfully");
+      if (response.status === 201) {
+        toast.success("Booking Updated Successfully");
         if (User.role === "admin") {
           GetBookingForUser();
         } else {
@@ -190,15 +195,14 @@ const Rental = () => {
     }
   }
 
-  const DeleteBookings = async (userId, rentalId, bikeId) => {
-    const user = userId;
+  const DeleteBookings = async (rentalId, bikeId) => {
     const rental = rentalId;
     const bike = bikeId;
 
-    console.log(`user${userId} and rental${rentalId}`);
+    // console.log(`user${userId} and rental${rentalId}`);
     try {
       const response = await fetch(
-        `http://localhost:4000/api/rental/booking/${rental}/${user}/${bike}`,
+        `http://localhost:4000/api/rental/booking/${rental}/${UserData}/${bike}`,
         {
           method: "DELETE",
           headers: {
@@ -209,9 +213,9 @@ const Rental = () => {
       if (response.ok) {
         toast.success("Rental deleted successfully");
         if (User.role === "admin") {
-          GetBookingForUser();
-        } else {
           GetBookingByUser();
+        } else {
+          GetBookingForUser();
         }
       } else {
         toast.warning("Failed to delete booking");
@@ -222,7 +226,7 @@ const Rental = () => {
   };
 
   useEffect(() => {
-    if (User.role === "user") {
+    if (User.role === "user" || User.role === "owner") {
       GetBookingByUser();
     } else {
       GetBookingForUser();
@@ -248,7 +252,7 @@ const Rental = () => {
               justifyContent: "space-between",
             }}
           >
-            {User.role === "user" ? (
+            {User.role === "user" || User.role === "owner" ? (
               ""
             ) : (
               <div>
@@ -291,7 +295,8 @@ const Rental = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rentalData.length > 0 &&
+                {rentalData &&
+                  rentalData.length > 0 &&
                   rentalData.map((row, index) => (
                     <StyledTableRow key={row.name}>
                       <StyledTableCell
@@ -375,84 +380,53 @@ const Rental = () => {
                         )}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        <button
-                          style={{ border: "none", cursor: "pointer" }}
-                          onClick={() => {
-                            if (row.status === "Booked") {
-                              setIsOpen(true);
-                              setBookingId(row?._id);
-                              setEditData({
-                                firstname: row.firstname,
-                                lastname: row.lastname,
-                                email: row.email,
-                                phone: row.phone,
-                                age: row.age,
-                                date: row.date,
-                                startTime: row.startTime,
-                                endTime: row.endTime,
-                                city: row.city,
-                              });
-                            } else if (row.status === "Completed") {
-                              toast.warning(
-                                "This booking is already Completed"
-                              );
-                            } else {
-                              toast.warning("This booking is already Cancel");
-                            }
-                          }}
-                        >
-                          <i
-                            class="fa-regular fa-pen-to-square"
-                            style={{
-                              fontSize: "20px",
-                              color: "brown",
+                        <Tooltip title="Edit">
+                          <button
+                            style={{ border: "none", cursor: "pointer" }}
+                            onClick={() => {
+                              if (row.status === "Booked") {
+                                setIsOpen(true);
+                                setBookingId(row?._id);
+                                setEditData({
+                                  firstname: row.firstname,
+                                  lastname: row.lastname,
+                                  email: row.email,
+                                  phone: row.phone,
+                                  age: row.age,
+                                  date: row.date,
+                                  startTime: row.startTime,
+                                  endTime: row.endTime,
+                                  city: row.city,
+                                });
+                              } else if (row.status === "Cancel Booking") {
+                                toast.warning(
+                                  "This booking is already Cancel Booking"
+                                );
+                              } else {
+                                toast.warning("This booking is already Cancel");
+                              }
                             }}
-                          />
-                        </button>
-                        <button
-                          style={{
-                            border: "none",
-                            cursor: "pointer",
-                            marginLeft: "20px",
-                          }}
-                          disabled={row.isCompleted}
-                          onClick={() => {
-                            if (row.status === "Booked") {
-                              DeleteBookings(
-                                row?.user,
-                                row?._id,
-                                row?.bike?._id
-                              );
-                            } else if (row.status === "Completed") {
-                              toast.warning(
-                                "This booking is already Completed"
-                              );
-                            } else {
-                              toast.warning("This booking is already Cancel");
-                            }
-                          }}
-                        >
-                          <i
-                            class="fa-solid fa-user-xmark"
-                            style={{
-                              fontSize: "20px",
-                              color: "red",
-                            }}
-                          />
-                        </button>
-                        {User.role === "user" ? (
+                          >
+                            <i
+                              class="fa-regular fa-pen-to-square"
+                              style={{
+                                fontSize: "20px",
+                                color: "brown",
+                              }}
+                            />
+                          </button>
+                        </Tooltip>
+                        <Tooltip title="Delete">
                           <button
                             style={{
                               border: "none",
                               cursor: "pointer",
                               marginLeft: "20px",
                             }}
-                            disabled={row.isCompleted}
                             onClick={() => {
                               if (row.status === "Booked") {
-                                setVerifyId(row?._id);
-                                setVerify(true);
-                              } else if (row.status === "Completed") {
+                                DeleteBookings(row?._id, row?.bike?._id);
+                              } else if (row.status === "") {
                                 toast.warning(
                                   "This booking is already Completed"
                                 );
@@ -462,13 +436,46 @@ const Rental = () => {
                             }}
                           >
                             <i
-                              class="fa-solid fa-users-viewfinder"
+                              class="fa-solid fa-user-xmark"
                               style={{
                                 fontSize: "20px",
                                 color: "red",
                               }}
                             />
                           </button>
+                        </Tooltip>
+                        {User.role === "user" ? (
+                          <Tooltip title="Verify UID">
+                            <button
+                              style={{
+                                border: "none",
+                                cursor: "pointer",
+                                marginLeft: "20px",
+                              }}
+                              onClick={() => {
+                                if (row.status === "Booked") {
+                                  setVerifyId(row?._id);
+                                  setVerify(true);
+                                } else if (row.status === "Completed") {
+                                  toast.warning(
+                                    "This booking is already Completed"
+                                  );
+                                } else {
+                                  toast.warning(
+                                    "This booking is already Cancel"
+                                  );
+                                }
+                              }}
+                            >
+                              <i
+                                class="fa-solid fa-users-viewfinder"
+                                style={{
+                                  fontSize: "20px",
+                                  color: "red",
+                                }}
+                              />
+                            </button>
+                          </Tooltip>
                         ) : (
                           ""
                         )}
@@ -480,207 +487,213 @@ const Rental = () => {
           </TableContainer>
         </div>
       </div>
-      <Dialog
-        open={isOpen}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Edit Your bookings"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <TextField
-              // className="form-fn"
-              id="filled-basic"
-              label="First Name"
-              variant="filled"
-              style={{
-                width: "240px",
-                marginRight: "12%",
-              }}
-              disabled
-              value={editData.firstname}
-              onChange={(e) => {
-                setEditData({
-                  ...editData,
-                  firstname: e.target.value,
-                });
-              }}
-            />
-            <TextField
-              // className="form-ln"
-              style={{
-                width: "235px",
-              }}
-              id="filled-basic"
-              label="Last Name"
-              variant="filled"
-              value={editData.lastname}
-              disabled
-              onChange={(e) => {
-                setEditData({
-                  ...editData,
-                  lastname: e.target.value,
-                });
-              }}
-            />
-            <TextField
-              // className="form-em"
-              id="filled-basic"
-              label="Email id"
-              variant="filled"
-              style={{
-                width: "250px",
-                marginRight: "12%",
-                marginTop: "3%",
-              }}
-              disabled
-              value={editData.email}
-              onChange={(e) => {
-                setEditData({
-                  ...editData,
-                  email: e.target.value,
-                });
-              }}
-            />
-            <TextField
-              // className="form-em"
-              id="filled-basic"
-              label="Age"
-              variant="filled"
-              style={{
-                width: "250px",
-                marginRight: "12%",
-                marginTop: "3%",
-              }}
-              value={editData.age}
-              onChange={(e) => {
-                setEditData({
-                  ...editData,
-                  age: e.target.value,
-                });
-              }}
-            />
-            <TextField
-              // className="form-ph"
-              id="filled-basic"
-              label="Phone no"
-              variant="filled"
-              style={{
-                marginTop: "3%",
-              }}
-              disabled
-              value={editData.phone}
-              onChange={(e) => {
-                setEditData({
-                  ...editData,
-                  phone: e.target.value,
-                });
-              }}
-            />
-            <InputLabel
-              style={{ marginTop: "15px" }}
-              id="demo-simple-select-standard-label"
-            >
-              Pick-up City
-            </InputLabel>
-            <select
-              style={{
-                width: "250px",
-                height: "55px",
-                marginRight: "64px",
-                marginBottom: "20px",
-              }}
-              value={editData.city}
-              onChange={(e) => {
-                setEditData({
-                  ...editData,
-                  city: e.target.value,
-                });
-              }}
-            >
-              <option value={"Thaltej"}>Thaltej</option>
-              <option value={"Shilaj"}>Shilaj</option>
-              <option value={"Bopal"}>Bopal</option>
-            </select>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <div
+      <div>
+        <RewordDialog
+          setIsReward={setIsReward}
+          isReward={isReward}
+          GetBookingByUser={GetBookingByUser}
+        />
+      </div>
+      <div className="account-verify">
+        <Dialog
+          open={isOpen}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Edit Your bookings"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              <TextField
+                id="filled-basic"
+                label="First Name"
+                variant="filled"
                 style={{
-                  position: "absolute",
-                  top: "59.5%",
-                  left: "56%",
-                  width: "38%",
+                  width: "240px",
+                  marginRight: "12%",
                 }}
-              >
-                <DatePicker
-                  value={dayjs(editData.date)}
-                  onChange={handleDateChange}
-                  format="DD/MM/YYYY"
-                  disablePast
-                />
-              </div>
-
-              <TimePicker
-                label="Start Time"
-                style={{
-                  width: "40%",
-                  marginTop: "3%",
-                }}
-                value={editData.startTime}
-                onChange={handleChangeStartTime}
-                viewRenderers={{
-                  hours: renderTimeViewClock,
-                  minutes: renderTimeViewClock,
-                  seconds: renderTimeViewClock,
+                disabled
+                value={editData.firstname}
+                onChange={(e) => {
+                  setEditData({
+                    ...editData,
+                    firstname: e.target.value,
+                  });
                 }}
               />
-
-              <div
+              <TextField
                 style={{
-                  width: "40%",
-                  position: "absolute",
-                  bottom: "14.5%",
-                  left: "55%",
+                  width: "235px",
+                }}
+                id="filled-basic"
+                label="Last Name"
+                variant="filled"
+                value={editData.lastname}
+                disabled
+                onChange={(e) => {
+                  setEditData({
+                    ...editData,
+                    lastname: e.target.value,
+                  });
+                }}
+              />
+              <TextField
+                id="filled-basic"
+                label="Email id"
+                variant="filled"
+                style={{
+                  width: "250px",
+                  marginRight: "12%",
+                  marginTop: "3%",
+                }}
+                disabled
+                value={editData.email}
+                onChange={(e) => {
+                  setEditData({
+                    ...editData,
+                    email: e.target.value,
+                  });
+                }}
+              />
+              <TextField
+                id="filled-basic"
+                label="Age"
+                variant="filled"
+                style={{
+                  width: "250px",
+                  marginRight: "12%",
+                  marginTop: "3%",
+                }}
+                value={editData.age}
+                onChange={(e) => {
+                  setEditData({
+                    ...editData,
+                    age: e.target.value,
+                  });
+                }}
+              />
+              <TextField
+                id="filled-basic"
+                label="Phone no"
+                variant="filled"
+                style={{
+                  marginTop: "3%",
+                }}
+                disabled
+                value={editData.phone}
+                onChange={(e) => {
+                  setEditData({
+                    ...editData,
+                    phone: e.target.value,
+                  });
+                }}
+              />
+              <InputLabel
+                style={{ marginTop: "15px" }}
+                id="demo-simple-select-standard-label"
+              >
+                Pick-up City
+              </InputLabel>
+              <select
+                style={{
+                  width: "250px",
+                  height: "55px",
+                  marginRight: "64px",
+                  marginBottom: "20px",
+                }}
+                value={editData.city}
+                onChange={(e) => {
+                  setEditData({
+                    ...editData,
+                    city: e.target.value,
+                  });
                 }}
               >
+                <option value={"Thaltej"}>Thaltej</option>
+                <option value={"Shilaj"}>Shilaj</option>
+                <option value={"Bopal"}>Bopal</option>
+              </select>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "59.5%",
+                    left: "56%",
+                    width: "38%",
+                  }}
+                >
+                  <DatePicker
+                    value={dayjs(editData.date)}
+                    onChange={handleDateChange}
+                    format="DD/MM/YYYY"
+                    disablePast
+                  />
+                </div>
+
                 <TimePicker
-                  label="End Time"
-                  value={editData.endTime}
-                  onChange={handleChangeEndTime}
+                  label="Start Time"
+                  style={{
+                    width: "40%",
+                    marginTop: "3%",
+                  }}
+                  value={editData.startTime}
+                  onChange={handleChangeStartTime}
                   viewRenderers={{
                     hours: renderTimeViewClock,
                     minutes: renderTimeViewClock,
                     seconds: renderTimeViewClock,
                   }}
                 />
-              </div>
-            </LocalizationProvider>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            onClick={() => {
-              handleUpdate();
-              setEditData({
-                firstname: "",
-                lastname: "",
-                email: "",
-                age: "",
-                date: "",
-                time: "",
-                city: "",
-              });
-              setIsOpen(false);
-            }}
-            autoFocus
-          >
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
+
+                <div
+                  style={{
+                    width: "40%",
+                    position: "absolute",
+                    bottom: "14.5%",
+                    left: "55%",
+                  }}
+                >
+                  <TimePicker
+                    label="End Time"
+                    value={editData.endTime}
+                    onChange={handleChangeEndTime}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                  />
+                </div>
+              </LocalizationProvider>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button
+              onClick={() => {
+                handleUpdate();
+                setEditData({
+                  firstname: "",
+                  lastname: "",
+                  email: "",
+                  age: "",
+                  date: "",
+                  time: "",
+                  city: "",
+                });
+                setIsOpen(false);
+              }}
+              autoFocus
+            >
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
       <div>
         <Dialog
           open={isVerify}
@@ -688,7 +701,19 @@ const Rental = () => {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">UID Verification</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            UID Verification
+            <IconButton
+              aria-label="close"
+              onClick={handleClose}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            ></IconButton>
+          </DialogTitle>
           <form onSubmit={SendUid}>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">

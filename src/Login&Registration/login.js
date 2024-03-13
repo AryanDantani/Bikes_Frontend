@@ -16,7 +16,7 @@ function Login() {
     event.preventDefault();
 
     if ((!loginData.email, !loginData.password)) {
-      return false;
+      return toast.warn("Please fill all the Field");
     }
 
     try {
@@ -159,7 +159,7 @@ function Login() {
                           </div>
                         </div>
                         <div className="form-btn">
-                          <button>Login</button>
+                          <button type="submit">Login</button>
                           <button
                             onClick={() => {
                               navigate("/signup");

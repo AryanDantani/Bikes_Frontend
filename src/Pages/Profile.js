@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import "./profile.scss";
@@ -19,6 +20,8 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
+import ProfileImageUploadButton from "./ProfileImgUpload";
+import BikesTable from "./BikesTable";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -37,12 +40,30 @@ const Profile = () => {
   const [usersData, setUsersData] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [rewardCards, setRewardCards] = useState([]);
+  const [uploadedImage, setUploadedImage] = useState("");
+  const [onFileSelect, setOnFileSelect] = useState({
+    image: "",
+  });
   const [deleteData, setDeleteData] = useState({
     email: "",
     password: "",
   });
   const [noReward, setNoReward] = useState(false);
   const [open, setOpen] = React.useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+
+  const handleDelete = () => {
+    setShowMessage(true);
+    setTimeout(() => {
+      setOpen(false);
+      setTimeout(() => {
+        setShowMessage(false);
+        localStorage.removeItem("user");
+        localStorage.removeItem("tokan");
+        navigate("/");
+      }, 1000);
+    }, 3000);
+  };
 
   const GetUserRewardByID = async () => {
     const userId = userData._id;
@@ -53,8 +74,28 @@ const Profile = () => {
     } else {
       setNoReward(true);
     }
-    console.log(data.length > 0 ? true : false);
-    setRewardCards(data);
+    setRewardCards(data.rewardData);
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const user = userData._id;
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/cloudinary/upload/${user}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      setUploadedImage(data.url);
+      GetUserByID();
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
   };
 
   const DeleteAccount = async () => {
@@ -63,28 +104,25 @@ const Profile = () => {
 
     if (userData.email !== Mail) {
       toast.warning("Please Provide Your Valid Email");
+    } else if (!Mail || !Password) {
+      toast.warning("Please Fill All Detailes");
     } else {
       try {
-        const response = await fetch(
+        let response = await fetch(
           `http://localhost:4000/api/users/${Mail}/password`,
           {
-            method: "POST", // Correct method
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ password: Password }), // Stringify body data
+            body: JSON.stringify({ password: Password }),
           }
         );
-        console.log("Delete Response:", response);
-
-        // Assuming the API returns a status code 204 for successful deletion
-        if (response.status === 201) {
-          toast.success("Account Deleted successfully");
-          setTimeout(() => {
-            navigate("/");
-            localStorage.removeItem("tokan");
-            localStorage.removeItem("user");
-          }, [5000]);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Delete Response:", data);
+          toast.success(data.message);
+          handleDelete();
         } else {
           toast.warning("Failed To Delete Account");
         }
@@ -126,15 +164,13 @@ const Profile = () => {
     const userId = userData._id;
     let data = await fetch(`http://localhost:4000/api/users/${userId}`);
     data = await data.json();
-    setUsersData(data);
+    setUsersData(data.user);
   };
 
   useEffect(() => {
     GetUserRewardByID();
     GetUserByID();
   }, []);
-
-  console.log(currentSlide, "");
 
   return (
     <div>
@@ -152,12 +188,33 @@ const Profile = () => {
             </button>
           </div>
           <div className="profile-bg">
-            <div className="profile"></div>
+            <div className="profile">
+              {/* <i
+                class="fa-solid fa-user"
+                style={{
+                  fontSize: "133px",
+                  color: "#c3c3c3",
+                }}
+              /> */}
+              <img
+                src={usersData.image}
+                style={{
+                  width: "160px",
+                  height: "150px",
+                  borderRadius: "50%",
+                }}
+              />
+            </div>
             <h3 className="userName">{userData.name}</h3>
             <div>
-              <button className="upload" type="file">
-                <i class="fa-solid fa-plus" />
-              </button>
+              <ProfileImageUploadButton
+                className="upload"
+                type="file"
+                setOnFileSelect={setOnFileSelect}
+                onFileSelect={onFileSelect}
+                setUploadedImage={setUploadedImage}
+                uploadImage={uploadImage}
+              />
             </div>
           </div>
         </div>
@@ -172,13 +229,15 @@ const Profile = () => {
         <div style={{ display: "flex", alignItems: "center" }}>
           <div className="voucher" />
           <div style={{ marginRight: "10px" }}>:</div>
-          <div>{rewardCards?.length ? rewardCards?.length : "0"}</div>
+          <div>{rewardCards ? rewardCards?.length : "0"}</div>
         </div>
       </div>
       <div>
         <div className="carousel">
           <ToastContainer />
-          {rewardCards.length > 3 ? (
+          {rewardCards &&
+              rewardCards.length > 0 &&
+              rewardCards ? (
             <button
               className="arrow prev"
               onClick={() => {
@@ -195,7 +254,8 @@ const Profile = () => {
           )}
 
           <div className="slider-container">
-            {rewardCards.length > 0 &&
+            {rewardCards &&
+              rewardCards.length > 0 &&
               rewardCards
                 .slice(currentSlide, currentSlide + 4)
                 .map((reward, index) => (
@@ -262,17 +322,21 @@ const Profile = () => {
                   </Card>
                 ))}
           </div>
-          {noReward ? (
+          <div>
+            <BikesTable />
+          </div>
+          {/* {noReward ? (
             <div className="noBookigs">
               <h2 style={{ paddingTop: "40px" }}>
-                There Are No Bookings Yet...
+                There Are No Rewards Yet...
               </h2>
             </div>
           ) : (
             ""
-          )}
+          )} */}
 
-          {rewardCards.length > 3 ? (
+          {rewardCards &&
+              rewardCards > 3 ? (
             <button
               className="arrow next"
               onClick={() => {
@@ -289,15 +353,24 @@ const Profile = () => {
           )}
         </div>
       </div>
-      <div>
+      <div className="deletaion">
         <BootstrapDialog
           onClose={() => {
             setOpen(false);
           }}
           aria-labelledby="customized-dialog-title"
           open={open}
+          fullWidth
+          maxWidth="sm"
         >
-          <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+          <DialogTitle
+            sx={{ m: 0, p: 2 }}
+            id="customized-dialog-title"
+            style={{
+              background: "#494141",
+              color: "#fff",
+            }}
+          >
             Delete Account Verification
           </DialogTitle>
           <IconButton
@@ -314,62 +387,85 @@ const Profile = () => {
           >
             <CloseIcon />
           </IconButton>
-          <form>
-            <DialogContent dividers>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div>
-                  <Typography>Email</Typography>
+          {showMessage ? (
+            <div className="container-deletaion">
+              {showMessage && (
+                <div className="success-message">
+                  Item successfully deleted!
                 </div>
-                <input
-                  value={deleteData.email}
-                  onChange={(e) => {
-                    setDeleteData({
-                      ...deleteData,
-                      email: e.target.value,
-                    });
+              )}
+            </div>
+          ) : (
+            <form>
+              <DialogContent dividers>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
                   }}
-                />
-              </div>
+                >
+                  <div style={{ marginRight: "13%" }}>
+                    <Typography>Email</Typography>
+                  </div>
+                  <input
+                    style={{ width: "40%", height: "25px" }}
+                    value={deleteData.email}
+                    onChange={(e) => {
+                      setDeleteData({
+                        ...deleteData,
+                        email: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
 
-              <div
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div style={{ marginRight: "8%" }}>
+                    <Typography>Password</Typography>
+                  </div>
+                  <input
+                    style={{ width: "40%", height: "25px" }}
+                    value={deleteData.password}
+                    onChange={(e) => {
+                      setDeleteData({
+                        ...deleteData,
+                        password: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
+              </DialogContent>
+              <DialogActions
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <div>
-                  <Typography>Password</Typography>
-                </div>
-                <input
-                  value={deleteData.password}
-                  onChange={(e) => {
-                    setDeleteData({
-                      ...deleteData,
-                      password: e.target.value,
-                    });
+                <Button
+                  style={{
+                    border: "1px solid brown",
+                    marginRight: "15px",
+                    color: "#000",
                   }}
-                />
-              </div>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                autoFocus
-                onClick={() => {
-                  setOpen(false);
-                  DeleteAccount();
-                }}
-              >
-                Save changes
-              </Button>
-            </DialogActions>
-          </form>
+                  autoFocus
+                  onClick={() => {
+                    DeleteAccount();
+                  }}
+                >
+                  confirm
+                </Button>
+              </DialogActions>
+            </form>
+          )}
         </BootstrapDialog>
       </div>
     </div>
