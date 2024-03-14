@@ -1,14 +1,13 @@
 .MuiDialog-paper {
   background-color: #f5f5f5;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px 0 rgba(147,160,185), 0 6px 20px 0 rgba(147,160,185);
 }
 
 .MuiDialogTitle-root {
-  background-color: #93b0b98f;
+  background-color: #93b0b9;
   font-family: emoji !important;
   padding: 16px;
-  /* border-radius: 10px 10px 0 0; */
   display: flex;
   font-weight: 800 !important;
   align-items: center;
@@ -19,12 +18,6 @@
   color: #333;
   margin-left: 16px;
 }
-
-/* .MuiDialogTitle-root img {
-    width: 32px;
-    height: 32px;
-    object-fit: cover;
-  } */
 
 .MuiDialogContent-root {
   padding: 24px;

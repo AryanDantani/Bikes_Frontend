@@ -11,6 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import "react-toastify/dist/ReactToastify.css";
+import fetcher from "../fetcher";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -51,25 +52,19 @@ export default function BikesTable() {
   }, []);
 
   const GetBikesDataById = async () => {
-    let data = await fetch(
-      `http://localhost:4000/api/add-rental/user/${userData}`
-    );
-    data = await data.json();
-    setOwnBikes(data);
+    let response = await fetcher.get(`/api/add-rental/user/${userData}`);
+    setOwnBikes(response.data);
   };
 
   const DeleteRentedBike = async (Id, bikeId) => {
     console.log(Id, bikeId);
     try {
-      let response = await fetch(
-        `http://localhost:4000/api/add-rental/${Id}/${bikeId} `,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      let response = await fetcher.get(`/api/add-rental/${Id}/${bikeId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         console.log("Delete Response:", data);
@@ -86,19 +81,13 @@ export default function BikesTable() {
 
   const UpdateStatus = async (Id, bikeId) => {
     try {
-      const url = `http://localhost:4000/api/add-rental/${Id}/${bikeId}`;
-      console.log("Request URL:", url);
-      
-      const response = await fetch(url, {
+      let response = await fetcher.get(`/api/add-rental/${Id}/${bikeId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ isActive: isActive }),
       });
-  
-      console.log("Response status:", response.status);
-  
       if (response.ok) {
         const data = await response.json();
         toast.success(data.message);
@@ -111,7 +100,6 @@ export default function BikesTable() {
       toast.error("Failed to Update status. Please try again.");
     }
   };
-  
 
   return (
     <TableContainer component={Paper}>

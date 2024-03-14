@@ -26,7 +26,7 @@ function PaperComponent(props) {
 export default function RewardDialog({ isReward, setIsReward, GetBookingByUser }) {
   const navigate = useNavigate();
   const handleClose = () => {
-    setIsReward(false);
+    // setIsReward(false);
     GetBookingByUser()
   };
 
@@ -71,7 +71,7 @@ export default function RewardDialog({ isReward, setIsReward, GetBookingByUser }
               navigate("/profile");
             }}
             style={{
-              backgroundColor: "#93b0b98f",
+              backgroundColor: "#93b0b9",
               fontSize: "revert",
               color: "#fff",
             }}

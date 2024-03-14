@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
@@ -22,6 +23,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import ProfileImageUploadButton from "./ProfileImgUpload";
 import BikesTable from "./BikesTable";
+import fetcher from "../fetcher";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -67,14 +69,13 @@ const Profile = () => {
 
   const GetUserRewardByID = async () => {
     const userId = userData._id;
-    let data = await fetch(`http://localhost:4000/api/rewards/${userId}`);
-    data = await data.json();
+    let data = await fetcher.get(`/api/rewards/${userId}`);
     if (data.length > 0) {
       setNoReward(false);
     } else {
       setNoReward(true);
     }
-    setRewardCards(data.rewardData);
+    setRewardCards(data?.data?.rewardData);
   };
 
   const uploadImage = async (file) => {
@@ -137,16 +138,12 @@ const Profile = () => {
     const user = userData._id;
     const reward = rewardId;
     try {
-      const response = await fetch(
-        `http://localhost:4000/api/rewards/${reward}/${user}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Delete Response:", response);
+      let response = await fetcher.get(`/api/rewards/${reward}/${user}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.status === 200) {
         toast.success("ClaimReward successfully");
         GetUserRewardByID();
@@ -162,9 +159,8 @@ const Profile = () => {
 
   const GetUserByID = async () => {
     const userId = userData._id;
-    let data = await fetch(`http://localhost:4000/api/users/${userId}`);
-    data = await data.json();
-    setUsersData(data.user);
+    let data = await fetcher.get(`/api/users/${userId}`);
+    setUsersData(data.data.user);
   };
 
   useEffect(() => {
@@ -189,21 +185,24 @@ const Profile = () => {
           </div>
           <div className="profile-bg">
             <div className="profile">
-              {/* <i
-                class="fa-solid fa-user"
-                style={{
-                  fontSize: "133px",
-                  color: "#c3c3c3",
-                }}
-              /> */}
-              <img
-                src={usersData.image}
-                style={{
-                  width: "160px",
-                  height: "150px",
-                  borderRadius: "50%",
-                }}
-              />
+              {!usersData.image ? (
+                <i
+                  class="fa-solid fa-user"
+                  style={{
+                    fontSize: "133px",
+                    color: "#c3c3c3",
+                  }}
+                />
+              ) : (
+                <img
+                  src={usersData.image}
+                  style={{
+                    width: "160px",
+                    height: "150px",
+                    borderRadius: "50%",
+                  }}
+                />
+              )}
             </div>
             <h3 className="userName">{userData.name}</h3>
             <div>
@@ -235,9 +234,7 @@ const Profile = () => {
       <div>
         <div className="carousel">
           <ToastContainer />
-          {rewardCards &&
-              rewardCards.length > 0 &&
-              rewardCards ? (
+          {rewardCards && rewardCards.length > 0 && rewardCards ? (
             <button
               className="arrow prev"
               onClick={() => {
@@ -335,8 +332,7 @@ const Profile = () => {
             ""
           )} */}
 
-          {rewardCards &&
-              rewardCards > 3 ? (
+          {rewardCards && rewardCards > 3 ? (
             <button
               className="arrow next"
               onClick={() => {

@@ -8,6 +8,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useNavigate } from "react-router-dom";
+import fetcher from "../fetcher";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -39,9 +40,8 @@ export default function User() {
   }, []);
 
   const GetAllUser = async () => {
-    let data = await fetch(`http://localhost:4000/api/users`);
-    data = await data.json();
-    setUsersData(data.user);
+    let data = await fetcher.get(`/api/users`);
+    setUsersData(data?.data?.user);
   };
 
   return (
