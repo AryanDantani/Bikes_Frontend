@@ -3,13 +3,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./newride.scss";
 import AddRentalBike from "./AddRentalBike";
-import dayjs from "dayjs";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
+import fetcher from "../fetcher";
 
 const NewRide = () => {
   const [data, setData] = useState([]);
@@ -41,10 +41,13 @@ const NewRide = () => {
   }, []);
 
   const GetAllCategory = async () => {
-    let result = await fetch("http://localhost:4000/api/category");
-    result = await result.json();
-    setData(result);
-    setSelected(result[0].bikes);
+    try {
+      let response = await fetcher.get("/api/category");
+      setData(response.data);
+      setSelected(response?.data[0]?.bikes);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   async function AddBikeForRent(event) {
@@ -72,24 +75,21 @@ const NewRide = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/add-rental",
-        {
-          userId: userId,
-          userName: rentalData.userName,
-          email: rentalData.email,
-          contact: rentalData.contact,
-          type: rentalData.type,
-          engine: rentalData.engine,
-          date: rentalData.date,
-          owner: rentalData.owner,
-          rent: rentalData.rent,
-          name: rentalData.name,
-          mileage: rentalData.mileage,
-          km: rentalData.km,
-          image: imageUrl,
-        }
-      );
+      let response = await fetcher.post("/api/add-rental", {
+        userId: userId,
+        userName: rentalData.userName,
+        email: rentalData.email,
+        contact: rentalData.contact,
+        type: rentalData.type,
+        engine: rentalData.engine,
+        date: rentalData.date,
+        owner: rentalData.owner,
+        rent: rentalData.rent,
+        name: rentalData.name,
+        mileage: rentalData.mileage,
+        km: rentalData.km,
+        image: imageUrl,
+      });
       if (response.status) {
         setIsOpen(false);
         GetAllCategory();

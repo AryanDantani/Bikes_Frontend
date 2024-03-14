@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./newPass.scss";
+import fetcher from "../fetcher";
 
 const NewPassword = () => {
   const [changePassData, setChangePassData] = useState({
@@ -26,12 +26,9 @@ const NewPassword = () => {
     }
 
     try {
-      const response = await axios.put(
-        `http://localhost:4000/api/users/${userEmail}/password`,
-        {
-          newPassword: changePassData.newPassword,
-        }
-      );
+      let response = await fetcher.put(`/api/users/${userEmail}/password`, {
+        newPassword: changePassData.newPassword,
+      });
 
       if (response.status === 200) {
         toast.success("Password Change Successfully");
@@ -55,7 +52,15 @@ const NewPassword = () => {
         <hr />
         <form onSubmit={changePassword} className="pass-form">
           <div style={{ display: "flex" }}>
-            <div style={{ marginRight: "15%", fontWeight:"600", marginTop:"65px" }}>New Password</div>
+            <div
+              style={{
+                marginRight: "15%",
+                fontWeight: "600",
+                marginTop: "65px",
+              }}
+            >
+              New Password
+            </div>
             <div>
               <input
                 className="pass-input"
@@ -70,7 +75,15 @@ const NewPassword = () => {
             </div>
           </div>
           <div style={{ display: "flex" }}>
-            <div style={{ marginRight: "10.5%", fontWeight:"600", marginTop:"67px" }}>Confirm Password</div>
+            <div
+              style={{
+                marginRight: "10.5%",
+                fontWeight: "600",
+                marginTop: "67px",
+              }}
+            >
+              Confirm Password
+            </div>
             <div>
               <input
                 className="pass-input"
@@ -85,7 +98,9 @@ const NewPassword = () => {
               />
             </div>
           </div>
-          <button className="pass-btn" type="submit">Save</button>
+          <button className="pass-btn" type="submit">
+            Save
+          </button>
         </form>
       </div>
     </div>

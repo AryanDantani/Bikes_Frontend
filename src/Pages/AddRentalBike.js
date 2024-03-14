@@ -2,7 +2,7 @@ import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
+import fetcher from "../fetcher";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
@@ -57,16 +57,12 @@ export default function AddRentalBike({
     formData.append("image", file);
 
     try {
-      const response = await fetch(
-        `http://localhost:4000/api/cloudinary/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      let response =await fetcher.POST("/api/cloudinary/upload", {
+        method: "POST",
+        body: formData,
+      });
       const data = await response.json();
       setImageUrl(data.url);
-      // console.log('Image uploaded successfully:', data);
     } catch (error) {
       console.error("Error uploading image:", error);
     }

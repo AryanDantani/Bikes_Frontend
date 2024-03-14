@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { cleanString } from "@mui/x-date-pickers/internals/hooks/useField/useField.utils";
 import "./bookingPage.scss";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

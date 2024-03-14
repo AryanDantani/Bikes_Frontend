@@ -7,7 +7,6 @@ import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
@@ -15,6 +14,7 @@ import "./rentalFrom.scss";
 import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
+import fetcher from "../fetcher";
 import {
   Dialog,
   DialogTitle,
@@ -129,18 +129,14 @@ const Rental = () => {
   };
 
   const GetBookingForUser = async () => {
-    let data = await fetch(
-      `http://localhost:4000/api/rental/user/bookings/${params?.id}`
-    );
-    data = await data.json();
-    console.log(data, "UserData");
-    setRentalData(data);
+    let data = await fetcher.get(`/api/rental/user/bookings/${params?.id}`);
+    // console.log(data, "UserData");
+    setRentalData(data.data);
   };
 
   const GetBookingByUser = async () => {
-    let data = await fetch(`http://localhost:4000/api/rental/user/${UserData}`);
-    data = await data.json();
-    setRentalData(data.rentalData);
+    let data = await fetcher.get(`/api/rental/user/${UserData}`);
+    setRentalData(data.data.rentalData);
     // console.log(data)
   };
 
@@ -152,10 +148,10 @@ const Rental = () => {
     }
     const UID = verifyUID.UID;
     try {
-      const response = await axios.post(
-        `http://localhost:4000/api/rental/genUID/${verifyID}/${UID}`
+      let response = await fetcher.post(
+        `/api/rental/genUID/${verifyID}/${UID}`
       );
-      console.log(response);
+      // console.log(response);
       if (response.status === 201) {
         toast.success("UID verified Successfully");
         setVerify(false);
@@ -168,19 +164,16 @@ const Rental = () => {
 
   async function handleUpdate() {
     try {
-      const response = await axios.put(
-        `http://localhost:4000/api/rental/${bookingId}`,
-        {
-          firstname: editData.firstname,
-          lastname: editData.lastname,
-          email: editData.email,
-          age: editData.age,
-          date: editData.date,
-          startTime: editData.startTime,
-          endTime: editData.endTime,
-          city: editData.city,
-        }
-      );
+      let response = await fetcher.put(`/api/rental/${bookingId}`, {
+        firstname: editData.firstname,
+        lastname: editData.lastname,
+        email: editData.email,
+        age: editData.age,
+        date: editData.date,
+        startTime: editData.startTime,
+        endTime: editData.endTime,
+        city: editData.city,
+      });
       if (response.status === 201) {
         toast.success("Booking Updated Successfully");
         if (User.role === "admin") {
@@ -198,8 +191,6 @@ const Rental = () => {
   const DeleteBookings = async (rentalId, bikeId) => {
     const rental = rentalId;
     const bike = bikeId;
-
-    // console.log(`user${userId} and rental${rentalId}`);
     try {
       const response = await fetch(
         `http://localhost:4000/api/rental/booking/${rental}/${UserData}/${bike}`,
@@ -278,7 +269,6 @@ const Rental = () => {
               </div>
             )}
 
-            {/* <div style={{ ml: "44%", fontSize:"30px" }}>Current Bookings</div> */}
           </div>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }} aria-label="customized table">

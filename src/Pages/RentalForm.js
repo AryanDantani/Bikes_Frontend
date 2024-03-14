@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import "./booking.scss";
-import axios from "axios";
+import fetcher from "../fetcher";
 import { useNavigate, useParams } from "react-router-dom";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -164,7 +164,7 @@ const RentalForm = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:4000/api/rental", {
+      const response = await fetcher.post(`/api/rental`, {
         firstname: bookingForm.firstname,
         lastname: bookingForm.lastname,
         age: bookingForm.age,
