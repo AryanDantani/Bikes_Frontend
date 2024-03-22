@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-concat */
 /* eslint-disable react-hooks/exhaustive-deps */
 import "./bookingPage.scss";
 import React, { useEffect, useState } from "react";
@@ -34,6 +35,7 @@ import {
 } from "@mui/material";
 import { tableCellClasses } from "@mui/material/TableCell";
 import RewordDialog from "../Componants/RewordDialog";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -130,14 +132,14 @@ const Rental = () => {
 
   const GetBookingForUser = async () => {
     let data = await fetcher.get(`/api/rental/user/bookings/${params?.id}`);
-    // console.log(data, "UserData");
-    setRentalData(data.data);
+    console.log(data?.data)
+    setRentalData(data?.data);
   };
 
   const GetBookingByUser = async () => {
     let data = await fetcher.get(`/api/rental/user/${UserData}`);
-    setRentalData(data.data.rentalData);
-    // console.log(data)
+    setRentalData(data?.data?.rentalData);
+    setIsReward(false);
   };
 
   async function SendUid(event) {
@@ -151,7 +153,6 @@ const Rental = () => {
       let response = await fetcher.post(
         `/api/rental/genUID/${verifyID}/${UID}`
       );
-      // console.log(response);
       if (response.status === 201) {
         toast.success("UID verified Successfully");
         setVerify(false);
@@ -204,9 +205,9 @@ const Rental = () => {
       if (response.ok) {
         toast.success("Rental deleted successfully");
         if (User.role === "admin") {
-          GetBookingByUser();
-        } else {
           GetBookingForUser();
+        } else {
+          GetBookingByUser();
         }
       } else {
         toast.warning("Failed to delete booking");
@@ -225,11 +226,19 @@ const Rental = () => {
   }, []);
 
   return (
-    <div>
+    <div className="bookings-main">
       <ToastContainer />
       <div>
         {User.role === "user" ? (
-          <h1> Your Bookings </h1>
+          <h1
+            style={{
+              fontFamily: "fangsong",
+              background: "burlywood",
+            }}
+          >
+            {" "}
+            Your Bookings{" "}
+          </h1>
         ) : (
           <h1> Available Rental Bookings </h1>
         )}
@@ -268,7 +277,6 @@ const Rental = () => {
                 </button>
               </div>
             )}
-
           </div>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -276,8 +284,12 @@ const Rental = () => {
                 <TableRow>
                   <StyledTableCell align="center">No.</StyledTableCell>
                   <StyledTableCell align="center">Model</StyledTableCell>
-                  <StyledTableCell align="center">time</StyledTableCell>
-                  <StyledTableCell align="center">Date</StyledTableCell>
+                  <StyledTableCell align="center">
+                    Booking Time (Hours)
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    Bookings Date (Day)
+                  </StyledTableCell>
                   <StyledTableCell align="center">Rent</StyledTableCell>
                   <StyledTableCell align="center">Mileage</StyledTableCell>
                   <StyledTableCell align="center">status</StyledTableCell>
@@ -287,155 +299,165 @@ const Rental = () => {
               <TableBody>
                 {rentalData &&
                   rentalData.length > 0 &&
-                  rentalData.map((row, index) => (
-                    <StyledTableRow key={row.name}>
-                      <StyledTableCell
-                        component="th"
-                        scope="row"
-                        align="center"
-                      >
-                        {index + 1}.
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row?.bike?.name}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row?.startTime + " To " + row?.endTime}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row?.date}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row?.bike?.rent}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row?.bike?.mileage}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        align="center"
-                        style={{
-                          color: "#4aa146",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {row?.status === "Booked" ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginLeft: "33%",
-                            }}
-                          >
-                            <div className="svg-bg-bk" />
-                            <div style={{ marginLeft: "15px" }}>
-                              {row?.status}
-                            </div>
-                          </div>
-                        ) : (
-                          ""
-                        )}
+                  rentalData.map((row, index) => {
+                    // Calculation For Days by Dates
+                    const startDate = row?.startDate
+                      ? moment(row?.startDate, "DD/MM/YYYY")
+                      : null;
+                    const endDate = row?.endDate
+                      ? moment(row?.endDate, "DD/MM/YYYY")
+                      : null;
+                    const dateDifference = endDate?.diff(startDate, "days");
 
-                        {row?.status === "Completed" ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginLeft: "33%",
-                            }}
-                          >
-                            <div className="svg-bg" />
-                            <div style={{ marginLeft: "15px" }}>
-                              {row?.status}
-                            </div>
-                          </div>
-                        ) : (
-                          ""
-                        )}
+                    // Calculate Hours
+                    const startMoment = row?.startTime
+                      ? moment(row?.startTime, "hh:mm A")
+                      : null;
+                    const endMoment = row?.endTime
+                      ? moment(row?.endTime, "hh:mm A")
+                      : null;
 
-                        {row?.status === "Cancel Booking" ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginLeft: "33%",
-                            }}
-                          >
-                            <div className="svg-bg-cl" />
-                            <div style={{ marginLeft: "15px", color: "red" }}>
-                              {row?.status}
+                    const durationInHours = endMoment?.diff(
+                      startMoment,
+                      "hours"
+                    );
+
+                    return (
+                      <StyledTableRow key={row.name}>
+                        <StyledTableCell
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
+                          {index + 1}.
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row?.bike?.name}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row.startTime !== row.endTime ? (
+                            <div>
+                              <div>{row.startTime + " - " + row.endTime}</div>
+                              <div>[{durationInHours + " " + "Hours"}]</div>
                             </div>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Tooltip title="Edit">
-                          <button
-                            style={{ border: "none", cursor: "pointer" }}
-                            onClick={() => {
-                              if (row.status === "Booked") {
-                                setIsOpen(true);
-                                setBookingId(row?._id);
-                                setEditData({
-                                  firstname: row.firstname,
-                                  lastname: row.lastname,
-                                  email: row.email,
-                                  phone: row.phone,
-                                  age: row.age,
-                                  date: row.date,
-                                  startTime: row.startTime,
-                                  endTime: row.endTime,
-                                  city: row.city,
-                                });
-                              } else if (row.status === "Cancel Booking") {
-                                toast.warning(
-                                  "This booking is already Cancel Booking"
-                                );
-                              } else {
-                                toast.warning("This booking is already Cancel");
-                              }
-                            }}
-                          >
-                            <i
-                              class="fa-regular fa-pen-to-square"
+                          ) : (
+                            "-"
+                          )}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row.startDate !== row.endDate ? (
+                            <div>
+                              <div>{row.startDate + " to " + row.endDate}</div>
+                              <div>[{dateDifference + " " + "Days"}]</div>
+                            </div>
+                          ) : (
+                            row.startDate
+                          )}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row?.bike?.rent}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row?.bike?.mileage}
+                        </StyledTableCell>
+                        <StyledTableCell
+                          align="center"
+                          style={{
+                            color: "#4aa146",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {row?.status === "Booked" ? (
+                            <div
                               style={{
-                                fontSize: "20px",
-                                color: "brown",
+                                display: "flex",
+                                alignItems: "center",
+                                marginLeft: "33%",
                               }}
-                            />
-                          </button>
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                          <button
-                            style={{
-                              border: "none",
-                              cursor: "pointer",
-                              marginLeft: "20px",
-                            }}
-                            onClick={() => {
-                              if (row.status === "Booked") {
-                                DeleteBookings(row?._id, row?.bike?._id);
-                              } else if (row.status === "") {
-                                toast.warning(
-                                  "This booking is already Completed"
-                                );
-                              } else {
-                                toast.warning("This booking is already Cancel");
-                              }
-                            }}
-                          >
-                            <i
-                              class="fa-solid fa-user-xmark"
+                            >
+                              <div className="svg-bg-bk" />
+                              <div style={{ marginLeft: "15px" }}>
+                                {row?.status}
+                              </div>
+                            </div>
+                          ) : (
+                            ""
+                          )}
+
+                          {row?.status === "Completed" ? (
+                            <div
                               style={{
-                                fontSize: "20px",
-                                color: "red",
+                                display: "flex",
+                                alignItems: "center",
+                                marginLeft: "33%",
                               }}
-                            />
-                          </button>
-                        </Tooltip>
-                        {User.role === "user" ? (
-                          <Tooltip title="Verify UID">
+                            >
+                              <div className="svg-bg" />
+                              <div style={{ marginLeft: "15px" }}>
+                                {row?.status}
+                              </div>
+                            </div>
+                          ) : (
+                            ""
+                          )}
+
+                          {row?.status === "Cancel Booking" ? (
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                marginLeft: "33%",
+                              }}
+                            >
+                              <div className="svg-bg-cl" />
+                              <div style={{ marginLeft: "15px", color: "red" }}>
+                                {row?.status}
+                              </div>
+                            </div>
+                          ) : (
+                            ""
+                          )}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Tooltip title="Edit">
+                            <button
+                              style={{ border: "none", cursor: "pointer" }}
+                              onClick={() => {
+                                if (row.status === "Booked") {
+                                  setIsOpen(true);
+                                  setBookingId(row?._id);
+                                  setEditData({
+                                    firstname: row.firstname,
+                                    lastname: row.lastname,
+                                    email: row.email,
+                                    phone: row.phone,
+                                    age: row.age,
+                                    date: row.date,
+                                    startTime: row.startTime,
+                                    endTime: row.endTime,
+                                    city: row.city,
+                                  });
+                                } else if (row.status === "Cancel Booking") {
+                                  toast.warning(
+                                    "This booking is already Cancel Booking"
+                                  );
+                                } else {
+                                  toast.warning(
+                                    "This booking is already Cancel"
+                                  );
+                                }
+                              }}
+                            >
+                              <i
+                                class="fa-regular fa-pen-to-square"
+                                style={{
+                                  fontSize: "20px",
+                                  color: "brown",
+                                }}
+                              />
+                            </button>
+                          </Tooltip>
+                          <Tooltip title="Delete">
                             <button
                               style={{
                                 border: "none",
@@ -444,9 +466,8 @@ const Rental = () => {
                               }}
                               onClick={() => {
                                 if (row.status === "Booked") {
-                                  setVerifyId(row?._id);
-                                  setVerify(true);
-                                } else if (row.status === "Completed") {
+                                  DeleteBookings(row?._id, row?.bike?._id);
+                                } else if (row.status === "") {
                                   toast.warning(
                                     "This booking is already Completed"
                                   );
@@ -458,7 +479,7 @@ const Rental = () => {
                               }}
                             >
                               <i
-                                class="fa-solid fa-users-viewfinder"
+                                class="fa-solid fa-user-xmark"
                                 style={{
                                   fontSize: "20px",
                                   color: "red",
@@ -466,12 +487,45 @@ const Rental = () => {
                               />
                             </button>
                           </Tooltip>
-                        ) : (
-                          ""
-                        )}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
+                          {User.role === "user" || User.role === "owner"  ? (
+                            <Tooltip title="Verify UID">
+                              <button
+                                style={{
+                                  border: "none",
+                                  cursor: "pointer",
+                                  marginLeft: "20px",
+                                }}
+                                onClick={() => {
+                                  if (row.status === "Booked") {
+                                    setVerifyId(row?._id);
+                                    setVerify(true);
+                                  } else if (row.status === "Completed") {
+                                    toast.warning(
+                                      "This booking is already Completed"
+                                    );
+                                  } else {
+                                    toast.warning(
+                                      "This booking is already Cancel"
+                                    );
+                                  }
+                                }}
+                              >
+                                <i
+                                  class="fa-solid fa-users-viewfinder"
+                                  style={{
+                                    fontSize: "20px",
+                                    color: "red",
+                                  }}
+                                />
+                              </button>
+                            </Tooltip>
+                          ) : (
+                            ""
+                          )}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -691,7 +745,7 @@ const Rental = () => {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">
+          <DialogTitle id="alert-dialog-title" style={{width:"85%"}}>
             UID Verification
             <IconButton
               aria-label="close"

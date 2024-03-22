@@ -2,7 +2,7 @@ import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import fetcher from "../fetcher";
+// import fetcher from "../fetcher";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
@@ -52,15 +52,18 @@ export default function AddRentalBike({
     });
   };
 
+  // Upload profile Photo
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
-
     try {
-      let response =await fetcher.POST("/api/cloudinary/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:4000/api/cloudinary/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       const data = await response.json();
       setImageUrl(data.url);
     } catch (error) {
@@ -91,9 +94,10 @@ export default function AddRentalBike({
         <DialogTitle
           style={{
             cursor: "move",
-            // backgroundColor: "#000",
             color: "#000",
             fontFamily: "emoji",
+            width: "100%",
+            borderRadius: "0px",
           }}
           id="draggable-dialog-title"
         >
@@ -101,7 +105,6 @@ export default function AddRentalBike({
         </DialogTitle>
         <Divider />
         <form>
-          {/* <DialogContent> */}
           <div className="main-divs">
             <div>
               <div className="form-div">
@@ -322,7 +325,6 @@ export default function AddRentalBike({
                       disablePast
                     />
                   </LocalizationProvider>
-                  {/* <TextField value={rentalData?.available}/> */}
                 </div>
               </div>
               <div className="form-div">
@@ -392,12 +394,18 @@ export default function AddRentalBike({
             </div>
 
             <div className="side-Image">
-              <h3>𝑻𝒖𝒓𝒏 𝒚𝒐𝒖𝒓 𝒑𝒂𝒔𝒔𝒊𝒐𝒏 𝒊𝒏𝒕𝒐 𝒑𝒓𝒐𝒇𝒊𝒕 - 𝒍𝒊𝒔𝒕 𝒚𝒐𝒖𝒓 𝒎𝒐𝒕𝒐𝒓𝒄𝒚𝒄𝒍𝒆 𝒇𝒐𝒓 𝒓𝒆𝒏𝒕 𝒂𝒏𝒅 𝒎𝒂𝒌𝒆 𝒎𝒐𝒏𝒆𝒚 𝒅𝒐𝒊𝒏𝒈 𝒘𝒉𝒂𝒕 𝒚𝒐𝒖 𝒍𝒐𝒗𝒆</h3>
+              <h3>
+                𝑻𝒖𝒓𝒏 𝒚𝒐𝒖𝒓 𝒑𝒂𝒔𝒔𝒊𝒐𝒏 𝒊𝒏𝒕𝒐 𝒑𝒓𝒐𝒇𝒊𝒕 - 𝒍𝒊𝒔𝒕 𝒚𝒐𝒖𝒓 𝒎𝒐𝒕𝒐𝒓𝒄𝒚𝒄𝒍𝒆 𝒇𝒐𝒓 𝒓𝒆𝒏𝒕
+                𝒂𝒏𝒅 𝒎𝒂𝒌𝒆 𝒎𝒐𝒏𝒆𝒚 𝒅𝒐𝒊𝒏𝒈 𝒘𝒉𝒂𝒕 𝒚𝒐𝒖 𝒍𝒐𝒗𝒆
+              </h3>
             </div>
           </div>
-          {/* </DialogContent> */}
           <Divider />
-          <DialogActions>
+          <DialogActions
+            style={{
+              background: "#93b0b9",
+            }}
+          >
             <Button
               autoFocus
               onClick={handleClose}
@@ -410,12 +418,17 @@ export default function AddRentalBike({
             >
               Cancel
             </Button>
-            <Button style={{
+            <Button
+              style={{
                 height: "30px",
                 background: "whitesmoke",
                 fontFamily: "emoji",
                 color: "#000",
-              }} onClick={AddBikeForRent}>Submit</Button>
+              }}
+              onClick={AddBikeForRent}
+            >
+              Submit
+            </Button>
           </DialogActions>
         </form>
       </Dialog>

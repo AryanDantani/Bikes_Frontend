@@ -3,8 +3,9 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./sign.scss";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -13,8 +14,10 @@ function SignUp() {
     email: "",
     phone: "",
     password: "",
-    role:""
+    role: "",
   });
+  const [isLoad, setIsLoad] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function save(event) {
     event.preventDefault();
@@ -26,10 +29,10 @@ function SignUp() {
       !registerData.password,
       !registerData.role)
     ) {
-      alert("Please fill the form");
+      toast.warn("Please fill the form");
       return false;
     }
-
+    setIsLoad(true);
     try {
       const response = await axios.post(
         "http://localhost:4000/api/users/signup",
@@ -38,29 +41,42 @@ function SignUp() {
           email: registerData.email,
           phone: registerData.phone,
           password: registerData.password,
-          role: registerData.role
+          role: registerData.role,
         }
       );
 
       if (response.status === 201) {
-        console.log(response)
-        toast.success("User Registration Successfully");
+        if (!response.data.status) {
+          return toast.warn(response.data.message);
+        }
+        toast.success(response.data.message);
         setTimeout(() => {
-          navigate('/')
-        }, [5000])
+          navigate("/login");
+          setIsLoad(false);
+        }, [5000]);
       } else {
         const errorData = await response.json();
         toast.warning(`Error: ${errorData.message}`);
       }
     } catch (err) {
       console.error(err);
-      toast.error("An error occurred. Please check the console for more details.");
+      toast.error(
+        "An error occurred. Please check the console for more details."
+      );
     }
   }
 
   return (
     <div className="main-signup">
-      <ToastContainer/>
+      <ToastContainer />
+      {isLoad ? (
+        <div className="sign-loader-bg">
+          <CircularProgress />
+        </div>
+      ) : (
+        ""
+      )}
+
       <div className="sig-bg">
         <p>
           "Four wheels move the body; two wheels move the soul. Life is short,
@@ -76,14 +92,14 @@ function SignUp() {
             <div
               style={{
                 width: "60px",
-                height: "50px",
+                height: "60px",
                 background: "#000",
                 position: "absolute",
                 borderTopRightRadius: "40px",
                 borderBottomRightRadius: "40px",
-                display:"flex",
-                alignItems:"center",
-                justifyContent:"center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 left: "92%",
               }}
             >
@@ -170,7 +186,7 @@ function SignUp() {
                 </div>
                 <div>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className="form-control"
                     id="password"
                     placeholder="Enter password"
@@ -183,6 +199,17 @@ function SignUp() {
                       });
                     }}
                   />
+                  <button
+                    type="button"
+                    className="Show-passwor-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <i class="fa-solid fa-eye-slash"></i>
+                    ) : (
+                      <i class="fa-solid fa-eye"></i>
+                    )}{" "}
+                  </button>
                 </div>
               </div>
 
@@ -203,13 +230,26 @@ function SignUp() {
                       });
                     }}
                   >
-                    <option className="options">Select User Type</option>
-                    <option className="options" value={"user"}>User</option>
-                    <option className="options" value={"owner"}>Owner</option>
+                    <option className="options" style={{ background: "#000" }}>
+                      Select User Type
+                    </option>
+                    <option
+                      className="options"
+                      style={{ background: "#000" }}
+                      value={"user"}
+                    >
+                      User
+                    </option>
+                    <option
+                      className="options"
+                      style={{ background: "#000" }}
+                      value={"owner"}
+                    >
+                      Owner
+                    </option>
                   </select>
                 </div>
               </div>
-              
 
               <div className="reg-btn">
                 <button type="submit" onClick={save}>
@@ -229,7 +269,7 @@ function SignUp() {
                 <button
                   type="submit"
                   onClick={() => {
-                    navigate("/");
+                    navigate("/login");
                   }}
                 >
                   logIn

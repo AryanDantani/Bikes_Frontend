@@ -4,12 +4,16 @@ import { useNavigate } from "react-router-dom";
 import "./login.scss";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CircularProgress from "@mui/material/CircularProgress";
+import { UseChannelIdContext } from "../Context/Context";
 
 function Login() {
   const navigate = useNavigate();
+  const { setIsVisible } = UseChannelIdContext();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [forgotEmail, setForgotEmail] = useState({ email: "" });
   const [isforgot, setIsFogot] = useState(false);
+  const [isLoad, setIsLoad] = useState(false);
 
   axios.defaults.withCredentials = true;
   async function login(event) {
@@ -18,6 +22,7 @@ function Login() {
     if ((!loginData.email, !loginData.password)) {
       return toast.warn("Please fill all the Field");
     }
+    setIsLoad(true);
 
     try {
       const response = await axios.post(
@@ -28,21 +33,22 @@ function Login() {
         }
       );
 
-      console.log(response)
-
       if (response.data.statusCode === 200) {
-        console.log(response?.data);
         localStorage.setItem("user", JSON.stringify(response?.data?.data));
         localStorage.setItem("tokan", response.data.token);
         toast.success("Login in Successfully");
         setTimeout(() => {
-          navigate("/aboutus");
+          setIsLoad(false);
+          setIsVisible(false);
+          navigate("/");
         }, [5000]);
       } else {
         toast.error(response.data.message);
+        setIsLoad(false);
       }
     } catch (err) {
-      console.log(err);
+      setIsLoad(false);
+      toast.error(err);
     }
   }
 
@@ -56,8 +62,10 @@ function Login() {
     localStorage.setItem("userEmail", JSON.stringify(forgotEmail.email));
 
     if (!forgotEmail.email) {
-      return false;
+      return toast.warn("Please Fill All The Field");
     }
+
+    setIsLoad(true);
 
     try {
       const response = await axios.post(
@@ -68,7 +76,6 @@ function Login() {
       );
 
       if (response.status === 201) {
-        console.log(response?.data);
         toast("sent forgot password request successfully");
         setForgotEmail({
           email: "",
@@ -86,6 +93,14 @@ function Login() {
   return (
     <div className="main-div">
       <ToastContainer />
+      {isLoad ? (
+        <div className="loader-bg">
+          <CircularProgress className="loader" />
+        </div>
+      ) : (
+        ""
+      )}
+
       <div className="log-img">
         <p>
           We have no limitations when it comes to two wheelers and enjoy serving
@@ -95,6 +110,32 @@ function Login() {
         </p>
       </div>
       <div className="log-form">
+        <div className="logo-container">
+          <span
+            style={{
+              color: "darkgoldenrod",
+              fontSize: "80px",
+            }}
+          >
+            𝑀
+          </span>
+          <span
+            style={{
+              marginLeft: "-26px",
+              fontSize: "60px",
+            }}
+          >
+            𝒴
+          </span>
+          <span>𝐵𝐼𝒦𝐸</span>
+          <hr
+            style={{
+              marginLeft: "-11px",
+              width: "115%",
+              marginTop: "-30px",
+            }}
+          />
+        </div>
         <div className="container">
           <div>
             <div className="ad-sec">
@@ -111,12 +152,11 @@ function Login() {
               }}
             >
               <div className="header">
-                <h2 style={{ marginleft: "20px" }}>Login</h2>
+                <h3 style={{ marginleft: "20px" }}>Login</h3>
               </div>
               <br />
               <div className="row">
                 <div className="col-sm-6">
-                  {/*  */}
                   {!isforgot ? (
                     <>
                       <form onSubmit={login} className="form">

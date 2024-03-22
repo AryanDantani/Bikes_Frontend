@@ -2,14 +2,32 @@
   margin: 0;
   padding: 0;
 }
+.Show-passwor-btn {
+  width: 50px;
+  position: absolute;
+  border: 1px solid #fff;
+  height: 50px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  left: 96%;
+}
 .main-signup {
   width: 100%;
   height: 885px;
   display: flex;
   background-color: #000;
+  .sign-loader-bg {
+    position: absolute;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    background: #0000006b;
+    width: 100%;
+    height: 880px;
+  }
   .sig-bg {
     width: 100%;
-    height: 885px;
+    height: 945px;
     background-size: cover;
     background-image: url("../Images/hero-3.jpg");
     display: flex;
@@ -29,10 +47,10 @@
   }
   .sig-form {
     width: 40%;
-    height: 885px;
+    height: 945px;
     background-color: #15302b;
     .form-side {
-      margin-top: 30%;
+      margin-top: 20%;
     }
     h2 {
       color: #000;
@@ -63,7 +81,7 @@
         border-radius: 8px;
         padding: 7px;
         width: 350px;
-        height: 35px;
+        height: 51px;
         margin-right: 30px;
         background: transparent;
         color: #fff;
@@ -76,7 +94,8 @@
         border-radius: 8px;
         padding: 7px;
         width: 180px;
-        height: 45px;    
+        height: 45px;
+        margin-left: 20px;
         margin-right: 30px;
         background: transparent;
         color: #fff;

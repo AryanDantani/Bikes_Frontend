@@ -27,7 +27,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
@@ -37,12 +36,12 @@ export default function BikesTable() {
   const [ownbikes, setOwnBikes] = React.useState([]);
   const [isActive, setIsActive] = React.useState(false);
 
-  console.log(isActive);
-
   const handleToggle = (Id, bikeId) => {
     setIsActive((prevIsActive) => !prevIsActive);
-    UpdateStatus(Id, bikeId);
+    // Pass isActive from the component state to the UpdateStatus function
+    UpdateStatus(Id, bikeId, isActive);
   };
+
   const userData = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))._id
     : "";
@@ -53,21 +52,27 @@ export default function BikesTable() {
 
   const GetBikesDataById = async () => {
     let response = await fetcher.get(`/api/add-rental/user/${userData}`);
+    console.log(response.data);
     setOwnBikes(response.data);
   };
 
+  // Remove Rented Bike API
   const DeleteRentedBike = async (Id, bikeId) => {
-    console.log(Id, bikeId);
     try {
-      let response = await fetcher.get(`/api/add-rental/${Id}/${bikeId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
+      let response = await fetch(
+        `http://localhost:4000/api/add-rental/${Id}/${bikeId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(response.status); // Log the response status for debugging
+
+      if (response.status === 200) {
         const data = await response.json();
-        console.log("Delete Response:", data);
         toast.success(data.message);
         GetBikesDataById();
       } else {
@@ -79,18 +84,24 @@ export default function BikesTable() {
     }
   };
 
-  const UpdateStatus = async (Id, bikeId) => {
+  // Update Status of Rented Bikes
+  const UpdateStatus = async (Id, bikeId, isActive) => {
+    debugger;
     try {
-      let response = await fetcher.get(`/api/add-rental/${Id}/${bikeId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isActive: isActive }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(data.message);
+      let response = await fetch(
+        `http://localhost:4000/api/add-rental/${Id}/${bikeId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isActive: isActive }), // Stringify the body
+        }
+      );
+      // const data = await response.json(); // Await the response.json() call
+      console.log(response); // Log the data
+      if (response.status === 200) {
+        toast.success("done");
         GetBikesDataById();
       } else {
         toast.warning("Failed To Update Bike Status");
@@ -139,13 +150,13 @@ export default function BikesTable() {
                         }}
                       />
                     }
-                    label={isActive ? "Active" : "Deactive"}
+                    label={isActive ? "Deactive" : "Active" }
                   />
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   <button
                     onClick={() => {
-                      DeleteRentedBike(row._id, row.bikeId);
+                      DeleteRentedBike(row?._id, row?.bikeId);
                     }}
                   >
                     R

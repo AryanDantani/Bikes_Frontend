@@ -1,86 +1,76 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import "./drawer.scss";
+// Drawer.js
+import React from "react";
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-export default function SideBar() {
+const SideBar = () => {
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
 
-  const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
+  const handleDrawerOpen = () => {
+    setOpen(true);
   };
 
-  const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
-      <List style={{ backgroundColor: "goldenrod" }}>
-        <ListItem disablePadding>
-          <ListItemButton>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div className="sideLogo" style={{ marginRight: "25px" }} />
-              <div style={{ fontWeight: "800" }}>𝑀𝒴 𝐵𝐼𝒦𝐸</div> 
-            </div>
-            <ListItemText />
-          </ListItemButton>
-        </ListItem>
-      </List>
-      <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
   return (
     <div>
-      <Button onClick={toggleDrawer(true)}>
-        {" "}
-        <i
-          className="fa-solid fa-bars"
-          style={{
-            color: "#fff",
-            fontSize: "25px",
-          }}
-        />
-      </Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
-        {DrawerList}
+      <Drawer
+        anchor="left"
+        open={open}
+        onClose={handleDrawerClose}
+      >
+        <List>
+          <ListItem disablePadding onClick={handleDrawerClose}>
+            <ListItemButton>
+              {/* Render all navigation items */}
+              <ListItemIcon>
+                <i className="fa-solid fa-user" />
+              </ListItemIcon>
+              <ListItemText primary="New ride" onClick={() => navigate("/newride")} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={handleDrawerClose}>
+            <ListItemButton>
+              <ListItemIcon>
+                <i className="fa-solid fa-user" />
+              </ListItemIcon>
+              <ListItemText primary="Users" onClick={() => navigate("/users")} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={handleDrawerClose}>
+            <ListItemButton>
+              <ListItemIcon>
+                <i className="fa-solid fa-user" />
+              </ListItemIcon>
+              <ListItemText primary="Rental Services" onClick={() => navigate("/bookings")} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={handleDrawerClose}>
+            <ListItemButton>
+              <ListItemIcon>
+                <i className="fa-solid fa-user" />
+              </ListItemIcon>
+              <ListItemText primary="About Us" onClick={() => navigate("/aboutus")} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={handleDrawerClose}>
+            <ListItemButton>
+              <ListItemIcon>
+                <i className="fa-solid fa-user" />
+              </ListItemIcon>
+              <ListItemText primary="Profile" onClick={() => navigate("/profile")} />
+            </ListItemButton>
+          </ListItem>
+        </List>
       </Drawer>
+      <Button onClick={handleDrawerOpen}>
+        <i className="fa-solid fa-bars" style={{ color: "#fff", fontSize: "25px" }} />
+      </Button>
     </div>
   );
-}
+};
+
+export default SideBar;

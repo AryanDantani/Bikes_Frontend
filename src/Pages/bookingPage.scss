@@ -1,3 +1,18 @@
+.bookings-main {
+  width: 88%;
+  float: right;
+  h1 {
+    background: bisque;
+    width: 30%;
+    font-family: emoji;
+    margin-top: 21px;
+    margin-left: 2%;
+    border-radius: 15px;
+    margin-bottom: 18px;
+    /* border-top-right-radius: 15px; */
+    box-shadow: 0 4px 8px 0 rgba(121, 121, 121, 0.2), 0 6px 20px 0 rgba(255, 117, 0, 0.5);
+  }
+}
 .page-main {
   width: 100%;
   align-items: center;
@@ -43,5 +58,5 @@
 .css-og52vs-MuiTableCell-root.MuiTableCell-head {
   background-color: #fff !important;
   color: #000 !important;
-  font-weight: 600 !important;
+  font-weight: 800 !important;
 }

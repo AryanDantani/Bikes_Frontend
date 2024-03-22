@@ -26,7 +26,6 @@ function PaperComponent(props) {
 export default function RewardDialog({ isReward, setIsReward, GetBookingByUser }) {
   const navigate = useNavigate();
   const handleClose = () => {
-    // setIsReward(false);
     GetBookingByUser()
   };
 
@@ -38,7 +37,7 @@ export default function RewardDialog({ isReward, setIsReward, GetBookingByUser }
         PaperComponent={PaperComponent}
         aria-labelledby="draggable-dialog-title"
       >
-        <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
+        <DialogTitle style={{ cursor: "move", width:"100%", borderRadius:"0px" }} id="draggable-dialog-title">
           Reward
         </DialogTitle>
         <IconButton

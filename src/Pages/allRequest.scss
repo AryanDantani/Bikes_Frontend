@@ -1,0 +1,57 @@
+.request-main-status {
+  width: 88%;
+  float: right;
+}
+.reuest-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .status {
+    color: #02af02;
+    font-weight: 800;
+    margin-left: 10px;
+  }
+  .pan-status {
+    color: brown;
+    font-weight: 800;
+    margin-left: 10px;
+  }
+}
+.verfied-svg {
+  background-image: url("../Images/verified-symbol-icon.svg");
+  background-size: cover;
+  width: 26px;
+  height: 25px;
+}
+
+.panding-svg {
+  background-image: url("../Images/wait-svgrepo-com.svg");
+  background-size: cover;
+  width: 25px;
+  height: 25px;
+}
+
+.request-btn {
+  height: 33px;
+  width: 60%;
+  border: 1px solid #fff;
+  color: white;
+  background: #00c54f;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.request-header {
+  width: 37%;
+  font-family: auto;
+  font-size: 30px;
+  background-color: bisque;
+  text-align: center;
+  margin-top: 28px;
+  margin-bottom: 20px;
+  padding-left: 13%;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  box-shadow: 0 4px 8px 0 rgb(121 121 121 / 20%),
+    0 6px 20px 0 rgb(255 117 0 / 50%);
+}
