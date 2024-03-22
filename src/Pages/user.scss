@@ -1,0 +1,14 @@
+.User-image {
+  display: flex;
+  align-items: center;
+}
+.users-btn {
+  height: 30px;
+  width: 55%;
+  cursor: pointer;
+  border: 1px solid brown;
+  &:hover {
+    background-color: brown;
+    color: #fff;
+  }
+}

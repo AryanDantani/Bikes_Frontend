@@ -31,7 +31,6 @@ const Bookings = () => {
   };
 
   const DeleteBookings = async (bookingId) => {
-    console.log(bookingId, "bookingId");
     try {
       const response = await fetch(
         `http://localhost:3001/booking/${bookingId}`,
@@ -43,7 +42,6 @@ const Bookings = () => {
         }
       );
       if (response.ok) {
-        console.log("Booking deleted successfully");
         GetBookingForAdmin();
       } else {
         console.log("Failed to delete booking");

@@ -1,6 +1,8 @@
 .new-ride-main {
   font-family: Arial, sans-serif;
   padding: 40px;
+  float: right;
+  width: 88%;
   .header {
     display: flex;
     justify-content: space-between;
@@ -9,6 +11,15 @@
 
     h1 {
       font-size: 24px;
+      background: burlywood;
+      text-align: center;
+      height: 40px;
+      /* color: brown; */
+      width: 32%;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
 
     .add-bike {
@@ -27,7 +38,7 @@
       overflow: hidden;
       transition: color 0.3s, background-color 0.3s, box-shadow 0.3s;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
-    
+
       &::before {
         content: "";
         position: absolute;
@@ -41,17 +52,17 @@
         transition: transform 0.5s ease-out;
         z-index: -1;
       }
-    
+
       &:hover::before {
         transform: translate(-50%, -50%) scale(2);
       }
-    
+
       &:hover {
         color: #fff; /* White */
         background-color: brown; /* Darker green */
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Increase shadow size */
       }
-    
+
       .bike-animation {
         position: absolute;
         bottom: 100%;
@@ -60,7 +71,7 @@
         animation: rideBike 1s forwards;
         z-index: -1;
       }
-    
+
       @keyframes rideBike {
         0% {
           transform: translateX(-50%) translateY(100%);
@@ -70,14 +81,13 @@
         }
       }
     }
-    
   }
 
   .category {
     display: flex;
     // flex-wrap: wrap;
     gap: 20px;
-  
+
     .category-main {
       width: calc(33.33% - 20px);
       background-color: #000;
@@ -86,16 +96,20 @@
       cursor: pointer;
       color: #fff;
       font-family: emoji;
-  
+      &:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+          0 6px 20px 0 rgb(237 170 87 / 52%);
+      }
+
       // Add conditional styling for selected item
       .category-main.selected {
         background-color: red !important;
       }
-  
+
       .category-card {
         cursor: pointer;
       }
-  
+
       .category-img {
         text-align: center;
         h3 {
@@ -104,8 +118,6 @@
       }
     }
   }
-  
-  
 
   .ride-selection-header {
     display: flex;
@@ -114,7 +126,8 @@
     margin-top: 20px;
 
     h1 {
-      font-size: 20px;
+      font-size: 23px;
+      text-shadow: 2px 2px 8px #b77e4d;
     }
 
     .carousel-controls {
@@ -157,10 +170,12 @@
       width: calc(25% - 20px);
       background-color: #fff;
       border-radius: 5px;
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
       &:hover {
         cursor: pointer;
-        box-shadow: 0 4px 8px 0 	rgb(165, 42, 42), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        box-shadow: 0 4px 8px 0 rgb(165, 42, 42),
+          0 6px 20px 0 rgba(0, 0, 0, 0.19);
       }
 
       .card-media {

@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./newPass.scss";
 import fetcher from "../fetcher";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const NewPassword = () => {
   const [changePassData, setChangePassData] = useState({
@@ -16,13 +17,16 @@ const NewPassword = () => {
     ? JSON.parse(localStorage.getItem("userEmail"))
     : "";
 
+  // Change Password Api
   async function changePassword(event) {
     event.preventDefault();
-
-    // Check if newPassword and confirmPassword match
     if (changePassData.confirPassword !== changePassData.newPassword) {
       toast.warning("New Password and Confirm Password must be the same");
       return;
+    }
+
+    if ((!changePassData.newPassword, !changePassData.confirPassword)) {
+      return toast.warn("Please fill all the Field");
     }
 
     try {
@@ -33,7 +37,7 @@ const NewPassword = () => {
       if (response.status === 200) {
         toast.success("Password Change Successfully");
         setTimeout(() => {
-          navigate("/");
+          navigate("/login");
         }, [5000]);
       } else {
         alert(`Error: ${response.data.message}`);
@@ -46,6 +50,10 @@ const NewPassword = () => {
   return (
     <div className="main-pass-div">
       <ToastContainer />
+      <div className="Loader-bg">
+        <CircularProgress className="Loader"/>
+      </div>
+
       <div className="log-img" />
       <div className="bg-layer">
         <h3>Reset Password</h3>

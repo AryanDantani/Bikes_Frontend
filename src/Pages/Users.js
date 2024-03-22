@@ -9,11 +9,14 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useNavigate } from "react-router-dom";
 import fetcher from "../fetcher";
+import Avatar from "@mui/material/Avatar";
+import "./user.scss";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.white,
     color: theme.palette.common.black,
+    fontWeight: 800,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -45,7 +48,7 @@ export default function User() {
   };
 
   return (
-    <div>
+    <div className="bookings-main">
       <div>
         <h1>Available Users</h1>
       </div>
@@ -54,42 +57,46 @@ export default function User() {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>No.</StyledTableCell>
-                <StyledTableCell>Name</StyledTableCell>
-                <StyledTableCell>Email</StyledTableCell>
-                <StyledTableCell>Bookings</StyledTableCell>
-                <StyledTableCell>Contact No.</StyledTableCell>
-                <StyledTableCell>Action</StyledTableCell>
+                <StyledTableCell align="ceter">No.</StyledTableCell>
+                <StyledTableCell align="ceter">Name</StyledTableCell>
+                <StyledTableCell align="ceter">Email</StyledTableCell>
+                <StyledTableCell align="ceter">Role</StyledTableCell>
+                <StyledTableCell align="ceter">Bookings</StyledTableCell>
+                <StyledTableCell align="ceter">Contact No.</StyledTableCell>
+                <StyledTableCell align="ceter">Action</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {usersData.map((row, index) => (
                 <StyledTableRow key={row.name}>
-                  <StyledTableCell component="th" scope="row">
-                    ({index + 1})
+                  <StyledTableCell component="th" scope="row" align="ceter">
+                    {index + 1}.
                   </StyledTableCell>
                   <StyledTableCell
                     component="th"
                     scope="row"
+                    align="ceter"
                     onClick={() => {
                       console.log(row);
                     }}
                   >
-                    {row.name}
+                    <div className="User-image">
+                      <div>
+                        <Avatar alt="Remy Sharp" src={row.image} />
+                      </div>
+                      <div style={{ marginLeft: "10px" }}>{row.name}</div>
+                    </div>
                   </StyledTableCell>
-                  <StyledTableCell>{row.email}</StyledTableCell>
-                  <StyledTableCell>{row.bookings}</StyledTableCell>
-                  <StyledTableCell>{row.phone}</StyledTableCell>
-                  <StyledTableCell>
+                  <StyledTableCell align="ceter">{row.email}</StyledTableCell>
+                  <StyledTableCell align="ceter">{row.role}</StyledTableCell>
+                  <StyledTableCell align="ceter">
+                    {row.bookings}
+                  </StyledTableCell>
+                  <StyledTableCell align="ceter">{row.phone}</StyledTableCell>
+                  <StyledTableCell align="ceter">
                     <button
-                      style={{
-                        height: "30px",
-                        width: "40%",
-                        cursor: "pointer",
-                        border: "1px solid brown",
-                      }}
+                      className="users-btn"
                       onClick={() => {
-                        console.log(row);
                         navigate("/user/bookings/" + row?._id);
                       }}
                     >

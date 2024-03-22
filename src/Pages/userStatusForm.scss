@@ -1,0 +1,63 @@
+.Request-bg {
+  width: 88%;
+  height: 885px;
+  background: antiquewhite;
+  float: right;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .Requset-form-bg {
+    width: 50%;
+    height: 500px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    h3 {
+      float: left;
+      background-color: peru;
+      color: #fff;
+      padding: 15px;
+      width: 35%;
+      border-top-right-radius: 15px;
+      border-bottom-right-radius: 15px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      margin-top: 55px;
+    }
+    .text-name {
+      position: absolute;
+      top: 45%;
+      left: 43%;
+      div {
+        width: 400px;
+      }
+    }
+    .text-email {
+      position: absolute;
+      top: 53%;
+      left: 43%;
+      div {
+        width: 400px;
+      }
+    }
+    .text-description {
+      position: absolute;
+      left: 43%;
+      top: 61%;
+      div {
+        width: 400px;
+      }
+    }
+    .text-btn {
+      position: absolute;
+      width: 200px;
+      height: 40px;
+      left: 43%;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      background: peru;
+      top: 78%;
+    }
+  }
+}

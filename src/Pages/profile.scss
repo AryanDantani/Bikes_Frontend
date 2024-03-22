@@ -21,10 +21,11 @@
   align-items: center;
   justify-content: center;
   .main-box {
-    width: 90%;
+    width: 78%;
     height: 350px;
     background-color: #c76666;
     position: absolute;
+    left: 16%;
     top: 15%;
   }
   .profile-bg {
@@ -39,6 +40,11 @@
       position: absolute;
       top: 10%;
       left: 5%;
+      .loader-bg {
+        position: absolute;
+        top: 55px;
+        left: 55px;
+      }
     }
     .userName {
       font-size: 21px;
@@ -111,6 +117,7 @@
   justify-content: space-around;
   position: relative;
   top: -10%;
+  left: 10%;
   margin-top: 21px;
   color: #000;
   margin-left: 55px;
@@ -138,7 +145,6 @@
 .css-20nakn3-MuiModal-root-MuiPopover-root-MuiMenu-root {
   background: transparent !important;
 }
-
 
 .carousel {
   position: relative;
@@ -200,4 +206,3 @@
   margin-top: 30px;
   margin-left: 2%;
 }
-

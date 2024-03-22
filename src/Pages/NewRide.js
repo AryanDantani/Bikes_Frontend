@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./newride.scss";
 import AddRentalBike from "./AddRentalBike";
@@ -10,6 +9,8 @@ import Typography from "@mui/material/Typography";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import fetcher from "../fetcher";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const NewRide = () => {
   const [data, setData] = useState([]);
@@ -37,19 +38,35 @@ const NewRide = () => {
   const [dotIndex, setDotIndex] = useState(0);
 
   useEffect(() => {
-    GetAllCategory();
+    GetActiveBikesInCategory();
   }, []);
 
-  const GetAllCategory = async () => {
+  //get all Bikes categories
+  const GetActiveBikesInCategory = async (categoryId) => {
     try {
       let response = await fetcher.get("/api/category");
-      setData(response.data);
-      setSelected(response?.data[0]?.bikes);
+      const categoryData = response.data;
+      const category = categoryData.find(
+        (category) => category.id === categoryId || category.name === categoryId
+      );
+
+      if (!category) {
+        console.error("Category not found");
+        return;
+      }
+
+      const activeBikes = category.bikes.filter(
+        (bike) => bike.status !== "Active"
+      );
+      console.log(activeBikes);
+      setData(categoryData);
+      setSelected(activeBikes);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+  //Add Bike for Rent API
   async function AddBikeForRent(event) {
     event.preventDefault();
 
@@ -92,7 +109,7 @@ const NewRide = () => {
       });
       if (response.status) {
         setIsOpen(false);
-        GetAllCategory();
+        GetActiveBikesInCategory();
       } else {
         console.log("Error:", response.data.message);
       }
@@ -108,6 +125,7 @@ const NewRide = () => {
 
   return (
     <div className="new-ride-main">
+      <ToastContainer />
       <div className="header">
         <h1>𝑺𝒆𝒍𝒆𝒄𝒕 𝒀𝒐𝒖𝒓 𝑹𝒊𝒅𝒊𝒏𝒈 𝑻𝒚𝒑𝒆</h1>
         {User.role === "owner" && (
@@ -179,57 +197,77 @@ const NewRide = () => {
                     <Typography gutterBottom variant="h5" component="div">
                       {item.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "32%", fontWeight: "700" }}>
-                        Engine:
-                      </span>
-                      {item.engine}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "27%", fontWeight: "700" }}>
-                        Mileage:
-                      </span>
-                      {item.mileage}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "31%", fontWeight: "700" }}>
-                        Owner:
-                      </span>
-                      {item.owner}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "14%", fontWeight: "700" }}>
-                        Model:
-                      </span>
-                      {item.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "37%", fontWeight: "700" }}>
-                        Available:
-                      </span>
-                      {item.stock}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "25%", fontWeight: "700" }}>
-                        Km / Run:
-                      </span>
-                      {item.km}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <span style={{ paddingRight: "13%", fontWeight: "700" }}>
-                        Price For Rent:
-                      </span>
-                      {item.rent}
-                    </Typography>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <div>
+                        <Typography variant="body2" color="text.secondary">
+                          Engine:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Mileage:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Owner:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Model:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Available:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Km / Run:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Price For Rent:
+                        </Typography>
+                      </div>
+                      <div>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.engine}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.mileage}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.owner}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.stock}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.km}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.rent}
+                        </Typography>
+                      </div>
+                    </div>
                   </CardContent>
                   <CardActions>
                     <Button
                       size="small"
                       variant="contained"
-                      style={{ background: "brown", color: "#fff" }}
+                      style={{
+                        background: "brown",
+                        color: "#fff",
+                        marginLeft: "22%",
+                        width:"55%"
+                      }}
                       onClick={() => {
-                        console.log(item?._id);
-                        navigate("/booking/" + item?._id);
+                        if (item.stock <= 1) {
+                          return toast.warn("Bike Is Not Available Right Now");
+                        } else {
+                          navigate("/booking/" + item?._id);
+                        }
                       }}
                     >
                       Book Now
